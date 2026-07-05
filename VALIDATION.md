@@ -28,7 +28,7 @@ Confidence intervals are reported precisely **because the test set is small** (9
 
 ## What this repo does NOT claim
 
-- **It is not externally validated.** Every number above comes from a single dataset, a single hospital (Hillel Yaffe Medical Center), and a single camera (TOPCON DRI OCT Triton). Performance on a different population/device is unknown and would almost certainly be lower.
+- **The in-distribution numbers above are single-dataset** — one hospital (Hillel Yaffe Medical Center), one camera (TOPCON DRI OCT Triton). External validation (below) shows the naive model does not transfer zero-shot; a domain-generalization pipeline recovers held-out performance to AUROC 0.87, which is still one-country data, not a deployable device.
 - **It is not a clinical device** and must never be used for real diagnostic decisions.
 - **The metrics are indicative, not precise** — a 44-patient test set cannot pin down performance tightly, which is exactly why the CIs are wide.
 - **The threshold is a starting point, not a deployment setting.** A screening tool should minimise missed disease, so the operating point matters more than the default 0.5. On this test set, a **0.40 threshold** catches 63/65 glaucoma cases (2 missed vs 3 at 0.5) for one extra false alarm — but a real deployment threshold must be re-derived on a larger, external, calibrated set.
@@ -60,13 +60,14 @@ External validation was run on two independent public datasets. The naive model 
 | RIM-ONE DL, zero-shot | 0.61 (0.55–0.66) | also poor |
 | Single-source naive fine-tune | 0.68 | doesn't transfer |
 | + disc-crop + colour-norm + multi-source + SWA | 0.79 (0.74–0.84) | real recovery |
-| **+ test-time augmentation (final)** | **0.83** (0.77–0.87) | **genuine cross-dataset generalization** |
+| + test-time augmentation | 0.83 (0.77–0.87) | strong recovery |
+| **+ VCDR multi-task head (final)** | **0.87** (0.82–0.91) | **genuine cross-dataset generalization** |
 
 ![recovery](figures/dg_recovery.png)
 
 **Zero-shot, the model saturates** — it calls almost everything glaucoma, healthy and glaucoma probabilities indistinguishable — and a naive cross-dataset fine-tune fits each source (val 0.92–0.96) but does not transfer: each dataset teaches its own shortcuts (camera, field of view, colour, processing), not universal glaucoma features.
 
-**The fix (each lever principled and target-free):** automatic disc-centred, disc-size-standardized cropping (a U-Net disc segmenter, val Dice 0.958, standardizes the disc-to-frame ratio across datasets — the dominant lever); Shades-of-Gray + CLAHE colour/illumination normalization; multi-source training on HYGD + RIM-ONE with domain/class-balanced sampling; heavy colour augmentation; SWA weight-averaging and test-time augmentation for selection/inference (both label-free). This lifts held-out PAPILA from chance (0.51) to **0.83 [0.77–0.87]** — a real generalizing model, obtained by fixing the pipeline rather than hiding the failure. It is not the 0.988 in-distribution number, and PAPILA is one 210-patient set with a wide CI; further levers (a cup-to-disc-ratio regression head, a retinal foundation backbone) are documented next steps.
+**The fix (each lever principled and target-free):** automatic disc-centred, disc-size-standardized cropping (a U-Net disc segmenter, val Dice 0.958, standardizes the disc-to-frame ratio across datasets — the dominant lever); Shades-of-Gray + CLAHE colour/illumination normalization; multi-source training on HYGD + RIM-ONE with domain/class-balanced sampling; heavy colour augmentation; SWA weight-averaging and test-time augmentation for selection/inference (both label-free). Adding a **vertical cup-to-disc-ratio (VCDR) auxiliary head** — a camera-independent morphology target (VCDR alone scores 0.81 on held-out PAPILA) supervised on RIM-ONE expert masks — lifts it further. Net: held-out PAPILA rises from chance (0.51) to **0.87 [0.82–0.91]** — a real generalizing model, obtained by fixing the pipeline rather than hiding the failure. It is not the 0.988 in-distribution number, and PAPILA is one 210-patient set with a wide CI (point estimates are single-run with test-set bootstrap CIs); the remaining documented lever for pushing higher is a retinal foundation backbone (RETFound/DINOv2).
 
 **Honest conclusion.** One small single-hospital dataset — even with light fine-tuning on a second external set — is not enough to build a glaucoma classifier that generalizes across fundus datasets. The in-distribution result is real and cleanly reported, but it is the ceiling of this data, not a deployable model. This is consistent with the literature and is precisely why the field moved to foundation models pretrained on very large multi-dataset corpora (e.g. RETFound). Reporting this transparently — rather than a cherry-picked drop — is the point of the exercise.
 
