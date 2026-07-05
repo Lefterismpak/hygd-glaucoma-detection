@@ -1,0 +1,8 @@
+{
+  "source": "PAPILA",
+  "target": "RIMONE",
+  "target_auroc_zero_shot": 0.6062,
+  "target_auroc_after_finetune": 0.4669,
+  "best_source_val_auroc": 0.9246,
+  "delta": -0.1393
+}

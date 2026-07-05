@@ -46,3 +46,20 @@ A student who builds a model, externally validates it, finds it collapses, and r
 - `validation/external_prediction_collapse.png` — the prediction-distribution figure.
 - `validation/make_papila_labels.py`, `validation/eval_external.py` — reproducible.
 - PAPILA images are git-ignored (GPL-3.0+, not redistributed); the label CSV is derived metadata.
+
+---
+
+## Update — cross-dataset fine-tune (Tier-3): does a short fine-tune fix transfer? NO.
+
+Ran the honest test: fine-tune the HYGD model (layer4+fc, class-weighted, early-stopped) on ONE external dataset, evaluate on the OTHER (fully held out, never seen in fine-tuning). RIM-ONE zero-shot also confirmed the collapse generalizes (AUROC 0.606, still saturates — sens 1.0 / spec 0.0).
+
+| Fine-tune direction | target zero-shot | target after fine-tune | Δ | source-val (fit) |
+|---|---|---|---|---|
+| RIM-ONE → PAPILA | 0.508 | **0.683** | +0.18 | 0.961 |
+| PAPILA → RIM-ONE | 0.606 | **0.467** | −0.14 | 0.925 |
+
+**Verdict: fine-tuning on one dataset does NOT produce a model that transfers to another.** The best case (RIM-ONE→PAPILA) recovers to only 0.68 — still weak; the other direction actually *degrades* below chance (0.47). Crucially, the model fits each source dataset excellently (val AUROC 0.92–0.96) — so glaucoma IS learnable in each set individually. The failure is specifically **transfer**: each dataset teaches the model dataset-specific shortcuts (camera, field, processing), not universal glaucoma features.
+
+## Complete, honest conclusion
+
+A single small single-hospital dataset — even with fine-tuning on a second external set — is **not enough to build a glaucoma model that generalizes across fundus datasets.** In-distribution AUROC 0.988 is real but does not survive contact with other cameras/populations. This is consistent with the literature and is precisely why the field moved to foundation models (e.g. RETFound) pretrained on very large multi-dataset corpora. It is not a flaw in how this model was built; it is the honest ceiling of the data.

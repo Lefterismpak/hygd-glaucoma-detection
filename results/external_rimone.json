@@ -1,0 +1,40 @@
+{
+  "dataset": "RIMONE",
+  "n": 485,
+  "n_patients": 485,
+  "prevalence": 0.354639175257732,
+  "zero_shot": {
+    "auroc": 0.6062,
+    "auroc_95ci": [
+      0.5543,
+      0.6562
+    ],
+    "auprc": 0.4306,
+    "at_0.40": {
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "confusion_tn_fp_fn_tp": [
+        0,
+        313,
+        0,
+        172
+      ]
+    },
+    "ece_raw": 0.623,
+    "brier_raw": 0.6103
+  },
+  "recalibration": {
+    "note": "AUROC is invariant to monotone recalibration \u2014 the win here is calibration/threshold, not discrimination.",
+    "temperature": 54.846,
+    "eval_ece_raw": 0.636,
+    "eval_ece_temp": 0.1873,
+    "eval_ece_platt": 0.0616,
+    "eval_brier_raw": 0.6233,
+    "eval_brier_temp": 0.2578,
+    "threshold_for_sens>=0.90": {
+      "threshold": 0.983,
+      "eval_sensitivity": 0.8621,
+      "eval_specificity": 0.2812
+    }
+  }
+}
