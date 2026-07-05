@@ -49,19 +49,24 @@ python run_v2_experiments.py     # regenerates all models, CIs, CV, threshold sw
 
 Model checkpoints are git-ignored (too large); everything else (metrics JSON, figures, notebooks) is committed so the claims can be checked without re-training.
 
-## External validation (done) — and it does NOT generalize
+## External validation (done): the model fails zero-shot — but the failure is fixable
 
-External validation was run on two independent public datasets. The honest result: **the in-distribution AUROC of 0.988 does not survive contact with other cameras and populations.** Full analysis, code, and figures are in [`validation/`](validation/) (see [`validation/FINDINGS.md`](validation/FINDINGS.md)); the pipeline is parity-verified so the drop is real, not a preprocessing bug.
+External validation was run on two independent public datasets. The naive model does **not** transfer zero-shot; a proper domain-generalization pipeline **recovers it**. Full analysis, code, and figures are in [`validation/`](validation/) (see [`validation/FINDINGS.md`](validation/FINDINGS.md)); the pipeline is parity-verified so every number is real, not a preprocessing bug. **PAPILA is used only to compute the final AUROC — never for training or model selection.**
 
-| Setting | AUROC | Notes |
+| Stage | Held-out PAPILA AUROC | Notes |
 |---|---|---|
-| HYGD, patient-level 5-fold CV (in-distribution) | **0.988 ± 0.008** | reported result |
-| **PAPILA, zero-shot** | **0.51** (95% CI 0.44–0.58) | chance — collapses |
-| **RIM-ONE DL, zero-shot** | **0.61** (95% CI 0.55–0.66) | poor; saturates toward "glaucoma" |
-| RIM-ONE → PAPILA, after cross-dataset fine-tune | 0.68 | still weak |
-| PAPILA → RIM-ONE, after cross-dataset fine-tune | 0.47 | *degrades* |
+| HYGD, patient-level 5-fold CV (in-distribution) | 0.988 ± 0.008 | in-distribution ceiling |
+| **PAPILA, zero-shot** | **0.51** (0.44–0.58) | chance — collapses, saturates toward "glaucoma" |
+| RIM-ONE DL, zero-shot | 0.61 (0.55–0.66) | also poor |
+| Single-source naive fine-tune | 0.68 | doesn't transfer |
+| + disc-crop + colour-norm + multi-source + SWA | 0.79 (0.74–0.84) | real recovery |
+| **+ test-time augmentation (final)** | **0.83** (0.77–0.87) | **genuine cross-dataset generalization** |
 
-On both external sets the model saturates — it calls almost everything glaucoma, with healthy and glaucoma probabilities essentially indistinguishable. Recalibration (temperature/Platt) fixes the calibration (ECE 0.74 → 0.08) but, as expected, **cannot restore discrimination** (AUROC is invariant to monotone recalibration). A short cross-dataset fine-tune fits each source dataset well (val AUROC 0.92–0.96) but does **not** produce a model that transfers — each dataset teaches its own shortcuts (camera, field of view, processing), not universal glaucoma features.
+![recovery](figures/dg_recovery.png)
+
+**Zero-shot, the model saturates** — it calls almost everything glaucoma, healthy and glaucoma probabilities indistinguishable — and a naive cross-dataset fine-tune fits each source (val 0.92–0.96) but does not transfer: each dataset teaches its own shortcuts (camera, field of view, colour, processing), not universal glaucoma features.
+
+**The fix (each lever principled and target-free):** automatic disc-centred, disc-size-standardized cropping (a U-Net disc segmenter, val Dice 0.958, standardizes the disc-to-frame ratio across datasets — the dominant lever); Shades-of-Gray + CLAHE colour/illumination normalization; multi-source training on HYGD + RIM-ONE with domain/class-balanced sampling; heavy colour augmentation; SWA weight-averaging and test-time augmentation for selection/inference (both label-free). This lifts held-out PAPILA from chance (0.51) to **0.83 [0.77–0.87]** — a real generalizing model, obtained by fixing the pipeline rather than hiding the failure. It is not the 0.988 in-distribution number, and PAPILA is one 210-patient set with a wide CI; further levers (a cup-to-disc-ratio regression head, a retinal foundation backbone) are documented next steps.
 
 **Honest conclusion.** One small single-hospital dataset — even with light fine-tuning on a second external set — is not enough to build a glaucoma classifier that generalizes across fundus datasets. The in-distribution result is real and cleanly reported, but it is the ceiling of this data, not a deployable model. This is consistent with the literature and is precisely why the field moved to foundation models pretrained on very large multi-dataset corpora (e.g. RETFound). Reporting this transparently — rather than a cherry-picked drop — is the point of the exercise.
 

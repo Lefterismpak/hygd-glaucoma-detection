@@ -24,3 +24,6 @@ outreach/
 
 # external-validation datasets — never commit (RIM-ONE no redistribution; PAPILA image license unusual)
 validation/data/
+
+# contains dataset-derived fundus crops (RIM-ONE no-redistribution) — local only
+figures/dg_crops_contact_sheet.png

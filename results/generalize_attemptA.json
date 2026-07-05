@@ -1,0 +1,18 @@
+{
+  "attempt": "A_multisource_disccrop_colornorm_SWA",
+  "held_out_papila_auroc": 0.7943,
+  "papila_auroc_95ci": [
+    0.7426,
+    0.8447
+  ],
+  "model_selection": "SWA weight-average over epochs>=5 (target-free; PAPILA never used to select)",
+  "swa_source_val_auroc": 0.9792,
+  "prior_zero_shot_papila": 0.5077,
+  "prior_singlesource_finetune": 0.6834,
+  "levers": "auto-disc-crop (U-Net Dice 0.958) + shades-of-gray+CLAHE colour-norm + 2-source (HYGD+RIM-ONE) + heavy colour aug + domain/class-balanced sampler",
+  "held_out_papila_auroc_TTA": 0.8251,
+  "papila_auroc_95ci_TTA": [
+    0.7713,
+    0.8745
+  ]
+}

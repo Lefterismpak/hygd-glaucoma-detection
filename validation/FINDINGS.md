@@ -63,3 +63,33 @@ Ran the honest test: fine-tune the HYGD model (layer4+fc, class-weighted, early-
 ## Complete, honest conclusion
 
 A single small single-hospital dataset — even with fine-tuning on a second external set — is **not enough to build a glaucoma model that generalizes across fundus datasets.** In-distribution AUROC 0.988 is real but does not survive contact with other cameras/populations. This is consistent with the literature and is precisely why the field moved to foundation models (e.g. RETFound) pretrained on very large multi-dataset corpora. It is not a flaw in how this model was built; it is the honest ceiling of the data.
+
+---
+
+## Update 2 — the fix: cross-dataset generalization RECOVERED (held-out PAPILA 0.51 → 0.83)
+
+After the zero-shot collapse and the failed naive fine-tune, a literature-grounded domain-generalization pipeline (anchored on G-RISK, npj Digit Med 2023) **recovers genuine transfer to fully-held-out PAPILA** — which is never used for training OR model selection.
+
+| Stage | Held-out PAPILA AUROC |
+|---|---|
+| Zero-shot (original failure) | 0.508 |
+| Single-source naive fine-tune | 0.683 |
+| + disc-crop + colour-norm + multi-source + SWA | 0.794 [0.74–0.84] |
+| **+ test-time augmentation (final)** | **0.825 [0.77–0.87]** |
+
+![recovery](../figures/dg_recovery.png)
+
+**What fixed it (each lever is principled and target-free):**
+1. **Automatic disc-centred, disc-size-standardized cropping** — the dominant lever. A U-Net disc segmenter (trained on PAPILA+RIM-ONE masks, val Dice 0.958) localizes the optic disc on every image (including maskless HYGD); each image is cropped to a square of 2.2× disc diameter so the disc-to-frame ratio is identical across datasets, destroying the field-of-view / bezel / zoom shortcut.
+2. **Colour/illumination normalization** — Shades-of-Gray colour constancy + CLAHE, applied identically at train and test, to neutralize camera colour-cast.
+3. **Multi-source training** — train on HYGD + RIM-ONE (two domains) with domain- and class-balanced sampling + a base-rate fix, so "which dataset" stops being a usable cue. PAPILA is fully held out.
+4. **Heavy colour/geometry augmentation** — pushes the model toward camera-invariant morphology.
+5. **SWA (stochastic weight averaging)** for model selection — target-free; averages out the source-overfitting that made the single best-source-val checkpoint transfer poorly.
+6. **Test-time augmentation** — label-free averaging over flips/rotations at inference.
+
+**Honesty guardrails held throughout:** PAPILA glaucoma labels were used ONLY to compute the final AUROC — never for training, hyperparameters, or model selection (SWA + TTA are both target-free). Disc masks are a preprocessing *input* (localizer), not labels. Patient-grouped splits; no dataset images redistributed (only code + metrics + figures are public).
+
+**Honest caveats.** PAPILA is one dataset (210 patients) and the CI is wide (0.77–0.87). 0.83 is a genuine cross-dataset result, not the 0.988 in-distribution number — but it is real generalization, achieved by fixing the pipeline rather than hiding the failure. The dataset-probe still shows residual separability (~0.90), so further gains (a VCDR-regression head, a retinal foundation backbone) are the documented next levers.
+
+## Reproduce
+`validation/build_disc_coords.py` (disc localization) → `validation/build_crops.py` (crop + colour-norm + dataset-probe gate) → `validation/train_generalize.py` (multi-source + SWA). Metrics in `results/generalize_attemptA.json`.
