@@ -2,7 +2,7 @@
 
 > Status: **baseline + improved models trained, evaluated, and stress-tested** (2026-07-05): patient-level split, class-imbalance handling, three model configurations compared, 5-fold patient-level cross-validation, bootstrap 95% confidence intervals, a screening-oriented decision-threshold analysis, and Grad-CAM explainability.
 >
-> 📋 **[VALIDATION.md](VALIDATION.md) — why these numbers are honest, what they do *not* claim, and what external validation comes next.** Read this before trusting the AUC.
+> 📋 **[VALIDATION.md](VALIDATION.md) — why these numbers are honest, and the external-validation result: the model does NOT generalize to other datasets (in-distribution AUROC 0.988 → ~0.5 zero-shot on PAPILA).** Read this before trusting the AUC.
 
 ## 1. Clinical context
 
@@ -110,7 +110,7 @@ The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / speci
 
 ## 9. Limitations
 
-- **Single dataset, single hospital** (Hillel Yaffe Medical Center, Israel) — no external validation on a different population, camera, or clinical setting. Reported metrics will not necessarily generalize.
+- **Single dataset, single hospital** (Hillel Yaffe Medical Center, Israel). External validation was run (PAPILA, RIM-ONE DL) and the model **does not generalize** — AUROC drops from 0.988 in-distribution to ~0.5 zero-shot, and a light cross-dataset fine-tune does not recover it. See [`VALIDATION.md`](VALIDATION.md) / [`validation/FINDINGS.md`](validation/FINDINGS.md). Treat the in-distribution result as the ceiling of this data, not a deployable model.
 - **Small test set** — 99 images / 44 patients. Bootstrap 95% CIs are reported (§5) and are wide, so the single-split point estimates are indicative, not precise. The 5-fold patient-level cross-validation (§5, AUC 0.988 ± 0.008) mitigates this by showing stability across partitions, but every fold still comes from the same single-hospital dataset.
 - **Modest by design** — even the best model is only a partially-unfrozen ResNet18 (`layer4` + head), 10 epochs, no hyperparameter search, no architecture search. Explicitly not an attempt at maximum achievable performance (see the Scope note in §2). The point is a clean, honest, reproducible pipeline, not a leaderboard number.
 - **Threshold set for reporting, not deployment** — headline metrics use the default 0.5 threshold for comparability; §8 reports a screening-oriented threshold (sensitivity ≥ 0.95), but the final operating point for any real use should be chosen with clinical input, not fixed here.
