@@ -1,0 +1,52 @@
+{
+  "model": "finetune_layer4_aug",
+  "n_test": 99,
+  "n_pos": 65,
+  "n_neg": 34,
+  "recommended_threshold": 0.4,
+  "recommended_rationale": "screening: catches 63/65 disease (2 missed) for 3 false alarms; lower thresholds add false alarms without gaining sensitivity",
+  "sweep": [
+    {
+      "threshold": 0.3,
+      "sensitivity": 0.969,
+      "specificity": 0.824,
+      "missed_FN": 2,
+      "false_alarms_FP": 6
+    },
+    {
+      "threshold": 0.4,
+      "sensitivity": 0.969,
+      "specificity": 0.912,
+      "missed_FN": 2,
+      "false_alarms_FP": 3
+    },
+    {
+      "threshold": 0.5,
+      "sensitivity": 0.954,
+      "specificity": 0.941,
+      "missed_FN": 3,
+      "false_alarms_FP": 2
+    },
+    {
+      "threshold": 0.64,
+      "sensitivity": 0.938,
+      "specificity": 0.941,
+      "missed_FN": 4,
+      "false_alarms_FP": 2
+    },
+    {
+      "threshold": 0.7,
+      "sensitivity": 0.908,
+      "specificity": 0.941,
+      "missed_FN": 6,
+      "false_alarms_FP": 2
+    },
+    {
+      "threshold": 0.8,
+      "sensitivity": 0.892,
+      "specificity": 0.941,
+      "missed_FN": 7,
+      "false_alarms_FP": 2
+    }
+  ]
+}

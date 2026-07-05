@@ -144,6 +144,11 @@ def bootstrap_ci(y_true, y_prob, threshold=0.5, n_boot=2000, seed=42):
 def threshold_for_target_sensitivity(y_true, y_prob, target_sensitivity=0.95):
     """Find the highest threshold that still achieves >= target sensitivity.
 
+    NOTE: this returns the exact highest observed-probability boundary meeting the
+    constraint, which can be an unstable single point. For a deployment recommendation
+    prefer a full threshold sweep (see run_v2_experiments / results/threshold_sweep.json)
+    and pick a round, robust operating point (0.40 was chosen for this project).
+
     For a screening tool you usually fix a minimum acceptable sensitivity
     (catch most disease) and then take the best specificity available at that
     constraint — the opposite of just using 0.5.

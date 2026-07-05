@@ -89,7 +89,20 @@ Download the dataset into `data/raw/` (see §3 above), then run the notebooks in
 
 ## 8. Clinical interpretation
 
-The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / specificity 0.97 meant it rarely raised a false alarm but still missed about 1 in 9 true glaucoma cases — the wrong trade-off direction for a *screening* tool, where a missed disease usually costs more than a false alarm that just triggers a second look. That was a real, actionable finding, and the v2 work addressed it two ways: (1) fine-tuning the last residual block with augmentation lifted the **best model to sensitivity 0.954 / specificity 0.941** — a much more screening-appropriate balance while keeping AUC highest; and (2) a decision-threshold sweep found that lowering the operating point holds **sensitivity ≥ 0.95** at a modest specificity cost (threshold ≈ 0.64 for the best model, ≈ 0.47 for the frozen+aug model). Because a *screening* model should be tuned to minimise missed disease, the threshold — not the default 0.5 — is the right knob to set for deployment. All of that said, the test set is only 44 patients and the 95% CIs above are wide, so these are indicative operating points, not precise real-world estimates.
+The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / specificity 0.97 meant it rarely raised a false alarm but still missed about 1 in 9 true glaucoma cases — the wrong trade-off direction for a *screening* tool, where a missed disease usually costs more than a false alarm that just triggers a second look. The v2 work addressed this two ways.
+
+**(1) A better model.** Fine-tuning the last residual block with augmentation lifted the best model to sensitivity 0.954 / specificity 0.941 at the default 0.5 threshold — a much more screening-appropriate balance while keeping AUC highest.
+
+**(2) The right operating threshold.** For a *screening* tool the decision threshold, not the default 0.5, is the real knob: lowering it catches more disease at the cost of more false alarms. The trade-off on the test set (best model, 65 GON+ / 34 GON-):
+
+| threshold | sensitivity | specificity | missed (FN) | false alarms (FP) |
+|---|---|---|---|---|
+| 0.30 | 0.969 | 0.824 | 2 | 6 |
+| **0.40 (recommended for screening)** | **0.969** | **0.912** | **2** | **3** |
+| 0.50 (default) | 0.954 | 0.941 | 3 | 2 |
+| 0.64 | 0.938 | 0.941 | 4 | 2 |
+
+**Recommended operating point: 0.40.** It catches 63/65 glaucoma cases (2 missed vs 3 at the default) for just one extra false alarm — the sensible direction for screening, where a missed case costs more than a second look. Going lower to 0.30 buys nothing (same sensitivity, double the false alarms). This is a starting recommendation on a 44-patient test set with wide CIs — a real deployment threshold should be re-derived on a larger, external validation set with clinical input, not fixed from this data alone.
 
 ## 9. Limitations
 
