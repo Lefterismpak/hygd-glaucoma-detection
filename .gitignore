@@ -21,3 +21,6 @@ EXTERNAL_VALIDATION_PLAN.md
 
 # outreach strategy materials — local only, never public
 outreach/
+
+# external-validation datasets — never commit (RIM-ONE no redistribution; PAPILA image license unusual)
+validation/data/
