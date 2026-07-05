@@ -1,0 +1,40 @@
+{
+  "dataset": "PAPILA",
+  "n": 420,
+  "n_patients": 210,
+  "prevalence": 0.20714285714285716,
+  "zero_shot": {
+    "auroc": 0.5077,
+    "auroc_95ci": [
+      0.4385,
+      0.5812
+    ],
+    "auprc": 0.2283,
+    "at_0.40": {
+      "sensitivity": 0.9425,
+      "specificity": 0.018,
+      "confusion_tn_fp_fn_tp": [
+        6,
+        327,
+        5,
+        82
+      ]
+    },
+    "ece_raw": 0.7365,
+    "brier_raw": 0.7205
+  },
+  "recalibration": {
+    "note": "AUROC is invariant to monotone recalibration \u2014 the win here is calibration/threshold, not discrimination.",
+    "temperature": 81.392,
+    "eval_ece_raw": 0.7183,
+    "eval_ece_temp": 0.2866,
+    "eval_ece_platt": 0.0784,
+    "eval_brier_raw": 0.7015,
+    "eval_brier_temp": 0.2578,
+    "threshold_for_sens>=0.90": {
+      "threshold": 0.653,
+      "eval_sensitivity": 0.8676,
+      "eval_specificity": 0.0487
+    }
+  }
+}
