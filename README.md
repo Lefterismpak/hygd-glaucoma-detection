@@ -1,6 +1,8 @@
 # HYGD Glaucoma Detection from Fundus Images: Baseline Classification, Explainability, and Clinical Error Analysis
 
 > Status: **baseline + improved models trained, evaluated, and stress-tested** (2026-07-05): patient-level split, class-imbalance handling, three model configurations compared, 5-fold patient-level cross-validation, bootstrap 95% confidence intervals, a screening-oriented decision-threshold analysis, and Grad-CAM explainability.
+>
+> 📋 **[VALIDATION.md](VALIDATION.md) — why these numbers are honest, what they do *not* claim, and what external validation comes next.** Read this before trusting the AUC.
 
 ## 1. Clinical context
 

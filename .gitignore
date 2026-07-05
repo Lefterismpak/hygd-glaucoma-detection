@@ -17,3 +17,7 @@ results/*.ckpt
 # personal strategy/context — local only, never public
 PROJECT_BRIEF.md
 NEXT_STEPS.md
+EXTERNAL_VALIDATION_PLAN.md
+
+# outreach strategy materials — local only, never public
+outreach/
