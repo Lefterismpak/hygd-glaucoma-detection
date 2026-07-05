@@ -1,0 +1,11 @@
+{
+  "model": "results/finetune_layer4_aug.pt",
+  "n_correct": 94,
+  "n_wrong": 5,
+  "mean_quality_correct": 6.0420212765957455,
+  "mean_quality_wrong": 5.484,
+  "mannwhitney_u": 227.0,
+  "p_value_wrong_lower_quality": 0.4523008575142243,
+  "false_negatives_missed_glaucoma": 3,
+  "false_positives_false_alarm": 2
+}

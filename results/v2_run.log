@@ -1,0 +1,93 @@
+
+=== training frozen_aug (mode=frozen) ===
+    epoch 1/10  train=0.5244  val=0.4178
+    epoch 2/10  train=0.3470  val=0.3099
+    epoch 3/10  train=0.2891  val=0.2621
+    epoch 4/10  train=0.2523  val=0.2728
+    epoch 5/10  train=0.2561  val=0.2255
+    epoch 6/10  train=0.2169  val=0.2187
+    epoch 7/10  train=0.2077  val=0.2172
+    epoch 8/10  train=0.2186  val=0.2084
+    epoch 9/10  train=0.2444  val=0.2129
+    epoch 10/10  train=0.2086  val=0.2112
+  frozen_aug: AUC=0.965 sens=0.938 spec=0.882 (1368.4s)
+
+=== training finetune_layer4_aug (mode=finetune_layer4) ===
+    epoch 1/10  train=0.3136  val=0.3624
+    epoch 2/10  train=0.1230  val=0.1911
+    epoch 3/10  train=0.0730  val=0.2243
+    epoch 4/10  train=0.0602  val=0.1378
+    epoch 5/10  train=0.0576  val=0.2243
+    epoch 6/10  train=0.0392  val=0.1636
+    epoch 7/10  train=0.0272  val=0.1218
+    epoch 8/10  train=0.0204  val=0.0947
+    epoch 9/10  train=0.0131  val=0.0722
+    epoch 10/10  train=0.0233  val=0.0828
+  finetune_layer4_aug: AUC=0.976 sens=0.954 spec=0.941 (564.7s)
+
+saved results/v2_comparison.json
+
+=== 5-fold patient-level CV on best config: finetune_layer4_aug ===
+  fold 1/5 ...
+    epoch 1/10  train=0.2654  val=0.2102
+    epoch 2/10  train=0.1515  val=0.0718
+    epoch 3/10  train=0.0725  val=0.0806
+    epoch 4/10  train=0.0655  val=0.0965
+    epoch 5/10  train=0.0372  val=0.0985
+    epoch 6/10  train=0.0324  val=0.2165
+    epoch 7/10  train=0.0510  val=0.0998
+    epoch 8/10  train=0.0333  val=0.0889
+    epoch 9/10  train=0.0149  val=0.0958
+    epoch 10/10  train=0.0115  val=0.1089
+    fold 1 AUC=0.995
+  fold 2/5 ...
+    epoch 1/10  train=0.2992  val=0.2171
+    epoch 2/10  train=0.1368  val=0.2191
+    epoch 3/10  train=0.0838  val=0.0856
+    epoch 4/10  train=0.0739  val=0.1198
+    epoch 5/10  train=0.0432  val=0.1158
+    epoch 6/10  train=0.0422  val=0.1304
+    epoch 7/10  train=0.0220  val=0.0999
+    epoch 8/10  train=0.0201  val=0.0922
+    epoch 9/10  train=0.0398  val=0.1604
+    epoch 10/10  train=0.0218  val=0.1216
+    fold 2 AUC=0.995
+  fold 3/5 ...
+    epoch 1/10  train=0.2890  val=0.2948
+    epoch 2/10  train=0.1118  val=0.2765
+    epoch 3/10  train=0.0664  val=0.2154
+    epoch 4/10  train=0.0598  val=0.1995
+    epoch 5/10  train=0.0632  val=0.2245
+    epoch 6/10  train=0.0374  val=0.2566
+    epoch 7/10  train=0.0320  val=0.1768
+    epoch 8/10  train=0.0448  val=0.5899
+    epoch 9/10  train=0.0221  val=0.2578
+    epoch 10/10  train=0.0148  val=0.2399
+    fold 3 AUC=0.980
+  fold 4/5 ...
+    epoch 1/10  train=0.3133  val=0.3374
+    epoch 2/10  train=0.1294  val=0.2373
+    epoch 3/10  train=0.0682  val=0.2582
+    epoch 4/10  train=0.0368  val=0.2721
+    epoch 5/10  train=0.0482  val=0.2698
+    epoch 6/10  train=0.0353  val=0.2509
+    epoch 7/10  train=0.0194  val=0.2476
+    epoch 8/10  train=0.0254  val=0.3338
+    epoch 9/10  train=0.0188  val=0.2754
+    epoch 10/10  train=0.0274  val=0.3437
+    fold 4 AUC=0.978
+  fold 5/5 ...
+    epoch 1/10  train=0.3246  val=0.2207
+    epoch 2/10  train=0.1283  val=0.2105
+    epoch 3/10  train=0.0844  val=0.1693
+    epoch 4/10  train=0.0727  val=0.1752
+    epoch 5/10  train=0.0490  val=0.1377
+    epoch 6/10  train=0.0399  val=0.1248
+    epoch 7/10  train=0.0343  val=0.1453
+    epoch 8/10  train=0.0232  val=0.1414
+    epoch 9/10  train=0.0174  val=0.1619
+    epoch 10/10  train=0.0309  val=0.1763
+    fold 5 AUC=0.991
+
+5-fold CV AUC: 0.988 +/- 0.008
+saved results/cv_results.json

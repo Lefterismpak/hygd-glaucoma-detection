@@ -1,0 +1,17 @@
+{
+  "auc": 0.9524886877828054,
+  "sensitivity": 0.8923076923076924,
+  "specificity": 0.9705882352941176,
+  "confusion_matrix": [
+    [
+      33,
+      1
+    ],
+    [
+      7,
+      58
+    ]
+  ],
+  "n_test_images": 99,
+  "n_test_patients": 44
+}

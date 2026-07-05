@@ -1,0 +1,18 @@
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+results/*.pt
+results/*.h5
+results/*.ckpt
+
+.DS_Store
+
+# personal strategy/context — local only, never public
+PROJECT_BRIEF.md

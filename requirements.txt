@@ -1,0 +1,13 @@
+# Framework locked 2026-07-05: PyTorch + torchvision (pretrained backbones) + pytorch-grad-cam.
+
+numpy
+pandas
+matplotlib
+scikit-learn
+scipy
+pillow
+jupyter
+torch
+torchvision
+grad-cam
+certifi
