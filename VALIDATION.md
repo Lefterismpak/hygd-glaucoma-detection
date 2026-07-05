@@ -49,15 +49,21 @@ python run_v2_experiments.py     # regenerates all models, CIs, CV, threshold sw
 
 Model checkpoints are git-ignored (too large); everything else (metrics JSON, figures, notebooks) is committed so the claims can be checked without re-training.
 
-## What honest validation looks like next (planned)
+## External validation (done) — and it does NOT generalize
 
-The single most important next step is **external validation** — running this exact model on independent public datasets to measure the real generalization drop:
+External validation was run on two independent public datasets. The honest result: **the in-distribution AUROC of 0.988 does not survive contact with other cameras and populations.** Full analysis, code, and figures are in [`validation/`](validation/) (see [`validation/FINDINGS.md`](validation/FINDINGS.md)); the pipeline is parity-verified so the drop is real, not a preprocessing bug.
 
-1. Reproduce the model's logged probabilities from a fresh script (an inference-parity gate: a preprocessing mismatch would fake a "domain shift" that is really a bug).
-2. Evaluate **zero-shot at the patient level** on **PAPILA** (CC BY 4.0) and **RIM-ONE DL**, reporting AUROC + CIs and — critically — **calibration** (reliability diagram, ECE), since the external base rate of glaucoma differs from HYGD's 73% and will likely mis-calibrate the raw probabilities.
-3. Recover performance where possible via temperature/Platt recalibration and threshold re-selection, stating explicitly that AUROC is invariant to monotone recalibration — so the honest win there is *calibration*, not discrimination.
+| Setting | AUROC | Notes |
+|---|---|---|
+| HYGD, patient-level 5-fold CV (in-distribution) | **0.988 ± 0.008** | reported result |
+| **PAPILA, zero-shot** | **0.51** (95% CI 0.44–0.58) | chance — collapses |
+| **RIM-ONE DL, zero-shot** | **0.61** (95% CI 0.55–0.66) | poor; saturates toward "glaucoma" |
+| RIM-ONE → PAPILA, after cross-dataset fine-tune | 0.68 | still weak |
+| PAPILA → RIM-ONE, after cross-dataset fine-tune | 0.47 | *degrades* |
 
-That work is scoped and will live in an `external-validation` branch. Until it exists, this repo should be read as a **clean, honestly-reported single-dataset baseline** — no more, no less.
+On both external sets the model saturates — it calls almost everything glaucoma, with healthy and glaucoma probabilities essentially indistinguishable. Recalibration (temperature/Platt) fixes the calibration (ECE 0.74 → 0.08) but, as expected, **cannot restore discrimination** (AUROC is invariant to monotone recalibration). A short cross-dataset fine-tune fits each source dataset well (val AUROC 0.92–0.96) but does **not** produce a model that transfers — each dataset teaches its own shortcuts (camera, field of view, processing), not universal glaucoma features.
+
+**Honest conclusion.** One small single-hospital dataset — even with light fine-tuning on a second external set — is not enough to build a glaucoma classifier that generalizes across fundus datasets. The in-distribution result is real and cleanly reported, but it is the ceiling of this data, not a deployable model. This is consistent with the literature and is precisely why the field moved to foundation models pretrained on very large multi-dataset corpora (e.g. RETFound). Reporting this transparently — rather than a cherry-picked drop — is the point of the exercise.
 
 ## Attribution
 
