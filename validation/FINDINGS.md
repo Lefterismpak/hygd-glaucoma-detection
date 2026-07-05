@@ -93,3 +93,7 @@ After the zero-shot collapse and the failed naive fine-tune, a literature-ground
 
 ## Reproduce
 `validation/build_disc_coords.py` (disc localization) → `validation/build_crops.py` (crop + colour-norm + dataset-probe gate) → `validation/train_generalize.py` (multi-source + SWA). Metrics in `results/generalize_attemptA.json`.
+
+### Update 3 — VCDR auxiliary head (Attempt B): held-out PAPILA 0.825 → 0.871
+
+Adding a vertical cup-to-disc-ratio (VCDR) regression head to the multi-source model pushes held-out PAPILA AUROC to **0.871 [0.82–0.91]**. VCDR is a continuous, camera-independent glaucoma-morphology target (VCDR alone separates glaucoma at AUROC 0.96 on RIM-ONE and 0.81 on held-out PAPILA), so forcing the shared backbone to also predict it pulls features onto cupping rather than dataset texture — exactly the change most credited for G-RISK's transfer. VCDR is supervised ONLY where reliable (RIM-ONE expert masks; HYGD's U-Net-predicted VCDR is noisy on its SLO-derived images, so HYGD is masked out of the VCDR loss but still trains the classifier). PAPILA remains fully held out; SWA + TTA are target-free. A cup+disc U-Net (val Dice ~0.95/channel) provides the masks. `results/generalize_attemptB.json`. (Point estimates are single-run with test-set bootstrap CIs; the A→B lift is consistent with the VCDR mechanism.)
