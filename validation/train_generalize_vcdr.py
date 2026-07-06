@@ -111,13 +111,14 @@ def papila_auc(model, df, tta=False):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--epochs", type=int, default=20); ap.add_argument("--vcdr_w", type=float, default=0.5)
-    a = ap.parse_args(); torch.manual_seed(0)
+    ap.add_argument("--seed", type=int, default=0); ap.add_argument("--out", type=str, default="results/generalize_attemptB.json")
+    a = ap.parse_args(); torch.manual_seed(a.seed); np.random.seed(a.seed)
     df = data_table()
     src = df[df.dataset.isin(["HYGD", "RIMONE"])].reset_index(drop=True)
     pap = df[df.dataset == "PAPILA"].reset_index(drop=True)
     print(f"sources {len(src)} {dict(src.dataset.value_counts())} | VCDR-supervised {int(src.vcdr_w.sum())} | held-out PAPILA {len(pap)}")
 
-    tri, vai = next(GroupShuffleSplit(1, test_size=0.15, random_state=0).split(src, groups=src.patient_id))
+    tri, vai = next(GroupShuffleSplit(1, test_size=0.15, random_state=a.seed).split(src, groups=src.patient_id))
     tr, va = src.iloc[tri].reset_index(drop=True), src.iloc[vai].reset_index(drop=True)
     wds = tr.groupby("dataset")["label"].transform("count"); wcl = tr.groupby(["dataset", "label"])["label"].transform("count")
     sampler = WeightedRandomSampler(torch.tensor(((1.0 / wds) * (1.0 / wcl)).values, dtype=torch.double), len(tr), True)
@@ -158,11 +159,12 @@ def main():
     model.load_state_dict({k: (v / swa_n).to(ref[k].dtype).to(ref[k].device) for k, v in swa_sum.items()})
     final, Y, P = papila_auc(model, pap, tta=True)
     rng = np.random.default_rng(42); v = [roc_auc_score(Y[i], P[i]) for i in (rng.integers(0, len(Y), len(Y)) for _ in range(2000)) if len(np.unique(Y[i])) > 1]
-    res = {"attempt": "B_multitask_VCDR", "held_out_papila_auroc_TTA": round(float(final), 4),
+    res = {"attempt": "B_multitask_VCDR", "seed": a.seed, "held_out_papila_auroc_TTA": round(float(final), 4),
            "papila_auroc_95ci": [round(float(np.percentile(v, 2.5)), 4), round(float(np.percentile(v, 97.5)), 4)],
            "vcdr_weight": a.vcdr_w, "vcdr_supervised_on": "RIM-ONE only (reliable); HYGD masked out",
            "attempt_A_was": 0.8251}
-    (ROOT / "results/generalize_attemptB.json").write_text(json.dumps(res, indent=2))
+    out_path = ROOT / a.out; out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(res, indent=2))
     print(json.dumps(res, indent=2))
 
 

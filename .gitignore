@@ -27,3 +27,6 @@ validation/data/
 
 # contains dataset-derived fundus crops (RIM-ONE no-redistribution) — local only
 figures/dg_crops_contact_sheet.png
+
+# training stdout logs — build artifacts, local only
+logs/
