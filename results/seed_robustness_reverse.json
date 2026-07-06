@@ -1,0 +1,25 @@
+{
+  "attempt": "B_reverse_multitask_VCDR",
+  "metric": "held_out_RIMONE_AUROC_TTA (RIM-ONE never used for training/selection)",
+  "n_seeds": 5,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "per_seed_auroc": [
+    0.9265,
+    0.9051,
+    0.9215,
+    0.9001,
+    0.9222
+  ],
+  "mean": 0.9151,
+  "std": 0.0117,
+  "min": 0.9001,
+  "max": 0.9265,
+  "zero_shot_rimone_was": 0.606,
+  "note": "Symmetric to forward (held-out PAPILA). std = seed-to-seed training stochasticity."
+}

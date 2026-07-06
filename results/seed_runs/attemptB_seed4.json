@@ -1,0 +1,12 @@
+{
+  "attempt": "B_multitask_VCDR",
+  "seed": 4,
+  "held_out_papila_auroc_TTA": 0.8451,
+  "papila_auroc_95ci": [
+    0.7959,
+    0.889
+  ],
+  "vcdr_weight": 0.5,
+  "vcdr_supervised_on": "RIM-ONE only (reliable); HYGD masked out",
+  "attempt_A_was": 0.8251
+}

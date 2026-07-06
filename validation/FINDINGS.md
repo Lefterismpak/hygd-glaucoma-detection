@@ -97,3 +97,56 @@ After the zero-shot collapse and the failed naive fine-tune, a literature-ground
 ### Update 3 — VCDR auxiliary head (Attempt B): held-out PAPILA 0.825 → 0.871
 
 Adding a vertical cup-to-disc-ratio (VCDR) regression head to the multi-source model pushes held-out PAPILA AUROC to **0.871 [0.82–0.91]**. VCDR is a continuous, camera-independent glaucoma-morphology target (VCDR alone separates glaucoma at AUROC 0.96 on RIM-ONE and 0.81 on held-out PAPILA), so forcing the shared backbone to also predict it pulls features onto cupping rather than dataset texture — exactly the change most credited for G-RISK's transfer. VCDR is supervised ONLY where reliable (RIM-ONE expert masks; HYGD's U-Net-predicted VCDR is noisy on its SLO-derived images, so HYGD is masked out of the VCDR loss but still trains the classifier). PAPILA remains fully held out; SWA + TTA are target-free. A cup+disc U-Net (val Dice ~0.95/channel) provides the masks. `results/generalize_attemptB.json`. (Point estimates are single-run with test-set bootstrap CIs; the A→B lift is consistent with the VCDR mechanism.)
+
+---
+
+## Update 4 — seed robustness + symmetric external validation
+
+The Attempt-B headline (0.871) was a single run. Two things were then checked:
+is it seed-lucky, and does the same target-free recipe generalize in the *reverse*
+direction? Each seed varies weight init, augmentation, sampler, AND the source
+train/val split (`--seed` → `torch.manual_seed` + `np.random.seed` +
+`GroupShuffleSplit`). Seed 0 reproduces the published 0.8708 exactly.
+
+**(a) Seed robustness — held-out PAPILA (forward: train HYGD+RIM-ONE):**
+
+| seed | held-out PAPILA AUROC (TTA) |
+|---|---|
+| 0 (published) | 0.871 |
+| 1 | 0.838 |
+| 2 | 0.850 |
+| 3 | 0.884 |
+| 4 | 0.845 |
+| **mean ± std** | **0.857 ± 0.019** (range 0.838–0.884) |
+
+The generalization is **robust to seed** — every run clears 0.83, far above
+zero-shot (0.51) and single-source fine-tune (0.68). The published 0.871 sits
+near the top of the distribution, so the honest point estimate is **0.86 ± 0.02**.
+
+**(b) Symmetric direction — held-out RIM-ONE (reverse: train HYGD+PAPILA):**
+
+Same pipeline, roles swapped: RIM-ONE held out entirely; VCDR supervised on
+PAPILA expert contours (HYGD masked out). RIM-ONE never used for training/selection.
+
+| seed | held-out RIM-ONE AUROC (TTA) |
+|---|---|
+| 0 | 0.927 |
+| 1 | 0.905 |
+| 2 | 0.922 |
+| 3 | 0.900 |
+| 4 | 0.922 |
+| **mean ± std** | **0.915 ± 0.012** (range 0.900–0.927) |
+
+Held-out RIM-ONE recovers from zero-shot 0.61 to **0.915 ± 0.012**. Both held-out
+directions generalize well above chance → the fix **generalizes across datasets**,
+it is not tuned to PAPILA.
+
+**Honest caveat.** Held-out RIM-ONE scores higher than held-out PAPILA. RIM-ONE DL
+is distributed as tightly disc-cropped images and has higher glaucoma prevalence
+(0.35 vs 0.21), both of which plausibly make it an easier held-out target. The
+claim is **bidirectional recovery**, not that the two datasets are equally hard.
+
+Reproduce: `validation/train_generalize_vcdr.py --seed {0..4}` (forward) and
+`validation/train_generalize_vcdr_reverse.py --seed {0..4}` (reverse);
+aggregate with `validation/aggregate_seeds.py` / `aggregate_seeds_reverse.py`.
+Summaries: `results/seed_robustness_attemptB.json`, `results/seed_robustness_reverse.json`.

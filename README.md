@@ -2,7 +2,7 @@
 
 > Status: **baseline + improved models trained, evaluated, and stress-tested** (2026-07-05): patient-level split, class-imbalance handling, three model configurations compared, 5-fold patient-level cross-validation, bootstrap 95% confidence intervals, a screening-oriented decision-threshold analysis, and Grad-CAM explainability.
 >
-> 📋 **[VALIDATION.md](VALIDATION.md) — honest external validation: the model fails zero-shot on other datasets (0.988 → ~0.5 on PAPILA), but a domain-generalization pipeline (disc-crop + multi-source + SWA + TTA + VCDR) recovers held-out PAPILA to 0.87.** The full fail→fix story.
+> 📋 **[VALIDATION.md](VALIDATION.md) — honest external validation: the model fails zero-shot on other datasets (0.988 → ~0.5 on PAPILA), but a domain-generalization pipeline (disc-crop + multi-source + SWA + TTA + VCDR) recovers held-out PAPILA to 0.86 ± 0.02 and — symmetrically — held-out RIM-ONE to 0.92 ± 0.01 (5 seeds each, both sets held out from all training/selection).** The full fail→fix story.
 
 ## 1. Clinical context
 
@@ -110,7 +110,7 @@ The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / speci
 
 ## 9. Limitations
 
-- **Generalization** was tested honestly on two external datasets (PAPILA, RIM-ONE DL): the naive model collapses to ~0.5 zero-shot, but a domain-generalization pipeline (auto disc-crop + colour-norm + multi-source training + SWA + TTA) recovers held-out PAPILA to **0.87 [0.82–0.91]**, PAPILA never used for training/selection. See [`VALIDATION.md`](VALIDATION.md) / [`validation/FINDINGS.md`](validation/FINDINGS.md). Still one-country data with a wide CI — not a deployable device.
+- **Generalization** was tested honestly on two external datasets (PAPILA, RIM-ONE DL): the naive model collapses to ~0.5 zero-shot, but a domain-generalization pipeline (auto disc-crop + colour-norm + multi-source training + SWA + TTA + VCDR head) recovers held-out PAPILA to **0.86 ± 0.02 across 5 seeds** (best single run 0.87 [0.82–0.91]) and, in the symmetric direction (train HYGD+PAPILA), held-out RIM-ONE to **0.92 ± 0.01** — neither held-out set is ever used for training or model selection. See [`VALIDATION.md`](VALIDATION.md) / [`validation/FINDINGS.md`](validation/FINDINGS.md). Still public-dataset data with wide CIs — not a deployable device.
 - **Small test set** — 99 images / 44 patients. Bootstrap 95% CIs are reported (§5) and are wide, so the single-split point estimates are indicative, not precise. The 5-fold patient-level cross-validation (§5, AUC 0.988 ± 0.008) mitigates this by showing stability across partitions, but every fold still comes from the same single-hospital dataset.
 - **Modest by design** — even the best model is only a partially-unfrozen ResNet18 (`layer4` + head), 10 epochs, no hyperparameter search, no architecture search. Explicitly not an attempt at maximum achievable performance (see the Scope note in §2). The point is a clean, honest, reproducible pipeline, not a leaderboard number.
 - **Threshold set for reporting, not deployment** — headline metrics use the default 0.5 threshold for comparability; §8 reports a screening-oriented threshold (sensitivity ≥ 0.95), but the final operating point for any real use should be chosen with clinical input, not fixed here.

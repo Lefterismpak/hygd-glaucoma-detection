@@ -1,17 +1,18 @@
-"""Attempt B — multi-source training + VCDR auxiliary regression head.
+"""Symmetric external validation (REVERSE direction) of Attempt B.
 
-Same disc-crop / colour-norm / multi-source / SWA recipe as Attempt A, but the
-backbone also predicts vertical cup-to-disc ratio (VCDR) as an auxiliary target.
-VCDR is a continuous, camera-independent glaucoma morphology signal (VCDR alone
-separates glaucoma at AUROC 0.96 on RIM-ONE, 0.81 on held-out PAPILA), so the aux
-loss pulls the shared features onto cupping rather than dataset texture.
+Forward Attempt B trained on HYGD+RIM-ONE and held out PAPILA (0.86 +/- 0.02).
+This reverse run swaps the roles: train on HYGD+PAPILA, hold out RIM-ONE
+entirely. If the same target-free domain-generalization recipe also recovers a
+held-out RIM-ONE it was NEVER trained or selected on, the claim strengthens from
+"tuned to PAPILA" to "generalizes across datasets".
 
-VCDR is supervised ONLY where it is reliable: RIM-ONE (expert masks). HYGD VCDR
-(predicted on SLO-derived images) is noisy (VCDR->glaucoma only 0.61) so HYGD
-samples are masked out of the VCDR loss — they still contribute the classification
-loss. PAPILA stays fully held out.
+VCDR auxiliary head is supervised ONLY where the ratio is expert-derived and
+reliable. In this direction that is PAPILA (expert cup/disc contours, 2 graders);
+RIM-ONE is held out; HYGD VCDR is U-Net-predicted -> masked out of the VCDR loss.
+RIM-ONE is NEVER used for training or model selection — labels only for the final
+metric.
 
-Usage: python validation/train_generalize_vcdr.py [--epochs 20] [--vcdr_w 0.5]
+Usage: python validation/train_generalize_vcdr_reverse.py [--epochs 20] [--vcdr_w 0.5] [--seed 0] [--out PATH]
 """
 
 import argparse
@@ -33,7 +34,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "validation/data"
 DEV = "mps" if torch.backends.mps.is_available() else "cpu"
 IM_MEAN, IM_STD = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
-RELIABLE_VCDR = {"RIMONE"}  # HYGD VCDR is U-Net-predicted on SLO images -> unreliable
+HELD_OUT = "RIMONE"           # held out entirely (labels only for the final metric)
+SOURCES = ["HYGD", "PAPILA"]  # training sources
+RELIABLE_VCDR = {"PAPILA"}    # expert cup/disc contours; RIM-ONE held out, HYGD U-Net-predicted -> unreliable
 
 
 def data_table():
@@ -90,11 +93,10 @@ class MultiTask(nn.Module):
 
 
 @torch.no_grad()
-def papila_auc(model, df, tta=False):
+def heldout_auc(model, df, tta=False):
     model.eval()
     import torchvision.transforms.functional as F
     norm = transforms.Normalize(IM_MEAN, IM_STD)
-    def base(im): return transforms.functional.normalize(transforms.functional.to_tensor(im.resize((224, 224))), IM_MEAN, IM_STD)
     views = [lambda im: im]
     if tta:
         views += [lambda im: F.hflip(im), lambda im: F.vflip(im), lambda im: F.rotate(im, 10), lambda im: F.rotate(im, -10)]
@@ -111,12 +113,12 @@ def papila_auc(model, df, tta=False):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--epochs", type=int, default=20); ap.add_argument("--vcdr_w", type=float, default=0.5)
-    ap.add_argument("--seed", type=int, default=0); ap.add_argument("--out", type=str, default="results/generalize_attemptB.json")
+    ap.add_argument("--seed", type=int, default=0); ap.add_argument("--out", type=str, default="results/seed_runs_reverse/reverse_seed0.json")
     a = ap.parse_args(); torch.manual_seed(a.seed); np.random.seed(a.seed)
     df = data_table()
-    src = df[df.dataset.isin(["HYGD", "RIMONE"])].reset_index(drop=True)
-    pap = df[df.dataset == "PAPILA"].reset_index(drop=True)
-    print(f"sources {len(src)} {dict(src.dataset.value_counts())} | VCDR-supervised {int(src.vcdr_w.sum())} | held-out PAPILA {len(pap)}")
+    src = df[df.dataset.isin(SOURCES)].reset_index(drop=True)
+    hold = df[df.dataset == HELD_OUT].reset_index(drop=True)
+    print(f"sources {len(src)} {dict(src.dataset.value_counts())} | VCDR-supervised {int(src.vcdr_w.sum())} | held-out {HELD_OUT} {len(hold)}")
 
     tri, vai = next(GroupShuffleSplit(1, test_size=0.15, random_state=a.seed).split(src, groups=src.patient_id))
     tr, va = src.iloc[tri].reset_index(drop=True), src.iloc[vai].reset_index(drop=True)
@@ -148,21 +150,22 @@ def main():
             lcls = ce(logit, y)
             lv = (mse(torch.sigmoid(vpred), vc) * vw).sum() / (vw.sum() + 1e-6)
             (lcls + a.vcdr_w * lv).backward(); opt.step()
-        va_auc = val_auc(); pa, _, _ = papila_auc(model, pap)
+        va_auc = val_auc(); ha, _, _ = heldout_auc(model, hold)
         if ep >= SWA_START:
             sd = model.state_dict()
             swa_sum = {k: v.detach().cpu().double() for k, v in sd.items()} if swa_sum is None else {k: swa_sum[k] + sd[k].detach().cpu().double() for k in swa_sum}
             swa_n += 1
-        print(f"    epoch {ep+1}/{a.epochs}  src-val {va_auc:.3f}  [PAPILA {pa:.3f}]", flush=True)
+        print(f"    epoch {ep+1}/{a.epochs}  src-val {va_auc:.3f}  [{HELD_OUT} {ha:.3f}]", flush=True)
 
     ref = model.state_dict()
     model.load_state_dict({k: (v / swa_n).to(ref[k].dtype).to(ref[k].device) for k, v in swa_sum.items()})
-    final, Y, P = papila_auc(model, pap, tta=True)
+    final, Y, P = heldout_auc(model, hold, tta=True)
     rng = np.random.default_rng(42); v = [roc_auc_score(Y[i], P[i]) for i in (rng.integers(0, len(Y), len(Y)) for _ in range(2000)) if len(np.unique(Y[i])) > 1]
-    res = {"attempt": "B_multitask_VCDR", "seed": a.seed, "held_out_papila_auroc_TTA": round(float(final), 4),
-           "papila_auroc_95ci": [round(float(np.percentile(v, 2.5)), 4), round(float(np.percentile(v, 97.5)), 4)],
-           "vcdr_weight": a.vcdr_w, "vcdr_supervised_on": "RIM-ONE only (reliable); HYGD masked out",
-           "attempt_A_was": 0.8251}
+    res = {"attempt": "B_reverse_multitask_VCDR", "seed": a.seed, "held_out_dataset": HELD_OUT,
+           "held_out_auroc_TTA": round(float(final), 4),
+           "auroc_95ci": [round(float(np.percentile(v, 2.5)), 4), round(float(np.percentile(v, 97.5)), 4)],
+           "vcdr_weight": a.vcdr_w, "vcdr_supervised_on": "PAPILA only (expert contours); HYGD masked out",
+           "sources": SOURCES}
     out_path = ROOT / a.out; out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(res, indent=2))
     print(json.dumps(res, indent=2))

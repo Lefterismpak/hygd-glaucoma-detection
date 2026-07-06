@@ -1,0 +1,16 @@
+{
+  "attempt": "B_reverse_multitask_VCDR",
+  "seed": 0,
+  "held_out_dataset": "RIMONE",
+  "held_out_auroc_TTA": 0.9265,
+  "auroc_95ci": [
+    0.9012,
+    0.9497
+  ],
+  "vcdr_weight": 0.5,
+  "vcdr_supervised_on": "PAPILA only (expert contours); HYGD masked out",
+  "sources": [
+    "HYGD",
+    "PAPILA"
+  ]
+}
