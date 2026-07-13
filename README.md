@@ -1,8 +1,10 @@
 # HYGD Glaucoma Detection from Fundus Images: Baseline Classification, Explainability, and Clinical Error Analysis
 
-> Status: **baseline + improved models trained, evaluated, and stress-tested** (2026-07-05): patient-level split, class-imbalance handling, three model configurations compared, 5-fold patient-level cross-validation, bootstrap 95% confidence intervals, a screening-oriented decision-threshold analysis, and Grad-CAM explainability.
+> **Current status (2026-07-14):** the repaired duplicate-aware internal evaluation reports group AUROC **0.9904** (95% CI **0.9797-0.9980**) across 283 linked evaluation groups. This is strong single-site, post-development resampling evidence from one hospital and one camera.
 >
-> 📋 **[VALIDATION.md](VALIDATION.md) — honest external validation: the model fails zero-shot on other datasets (0.988 → ~0.5 on PAPILA), but a domain-generalization pipeline (disc-crop + multi-source + SWA + TTA + VCDR) recovers held-out PAPILA to 0.86 ± 0.02 and — symmetrically — held-out RIM-ONE to 0.92 ± 0.01 (5 seeds each, both sets held out from all training/selection).** The full fail→fix story.
+> **Bottom line:** transportability is not established. Later locked source-only tests and shortcut controls prevented the attractive development results from being promoted as external validation or clinical evidence.
+>
+> **Start here:** [HYGD Failure-First Glaucoma AI Audit](HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md) - a concise map of what was tested, what failed, what the evidence supports, and what would justify a genuinely different next study.
 
 ## 1. Clinical context
 
@@ -13,6 +15,17 @@ Glaucoma is a leading cause of irreversible blindness worldwide. It is often asy
 Build a clean, reproducible baseline classifier for glaucoma detection from retinal fundus images, paired with an honest explainability and clinical error analysis — not a state-of-the-art benchmark, not a clinical device.
 
 **Scope / non-goals (deliberate).** This is a clean, honest, reproducible baseline — explicitly *not* a PhD-level contribution, *not* SOTA-chasing, *not* a multi-dataset study, *not* OCT segmentation (a possible separate later project), and *not* a black-box tutorial clone. Every step is meant to be understandable and defensible rather than maximally performant.
+
+### Current evidence status
+
+| Status | Evidence | Meaning |
+|---|---|---|
+| `historical` | Single-split AUROC 0.976; CV AUROC 0.988 +/- 0.008 | Development results retained but superseded as the preferred internal estimate |
+| `preferred internal` | [Duplicate-aware repair](INTERNAL_EVALUATION_REPAIR.md): group AUROC 0.9904 [0.9797-0.9980] | Strong in-distribution discrimination; single-site post-development resampling only |
+| `adaptive development` | PAPILA/RIM-ONE recovery chronology in [VALIDATION.md](VALIDATION.md) and [validation/FINDINGS.md](validation/FINDINGS.md) | Historical development evidence, not untouched external validation |
+| `failed confirmatory` | [HYGD-CEXT-1.1](SOURCE_ONLY_QUALIFICATION_REPORT.md) and [HYGD-CEXT-2.0](HYGD_CEXT_2_0_RESULT.md) | Source-only qualification did not establish transportability; the confirmatory target-access gate remains blocked |
+| `mechanism only` | [Shortcut Map 1](HYGD_SHORTCUT_MAP_1_RESULT.md) | Source signal is strongly encoded; no bounded preprocessing repair was found |
+| `needs-proof` | RIM-ONE permutation mechanism and mixed-dataset use compatibility | Control behavior limits disease-AUROC interpretation; historical adaptive values should not support an external claim without clarification |
 
 ## 3. Dataset
 
@@ -36,7 +49,9 @@ Download: `https://physionet.org/content/hillel-yaffe-glaucoma-dataset/get-zip/1
 
 ## 5. Results
 
-All metrics are on the **same held-out test set** (99 images / 44 patients, zero patient overlap with train/val). Three configurations were compared, each evaluated at the default 0.5 probability threshold, with **bootstrap 95% confidence intervals** (2,000 resamples of the test set) to be honest about the small-sample uncertainty.
+### Historical development comparison
+
+The table below is retained as project history. All metrics are on the **same development test set** (99 images / 44 patients, zero supplied-patient overlap with train/val). The model configuration was selected after this comparison, and the confidence intervals were image-level despite repeated images per patient. These numbers are therefore not the preferred internal estimate.
 
 | Model | AUC | Sensitivity | Specificity |
 |---|---|---|---|
@@ -50,21 +65,26 @@ Best model — 95% CIs: AUC [0.943, 0.998], sensitivity [0.90, 1.00], specificit
 ![v2 ROC](figures/12_roc_v2.png)
 ![v2 confusion matrix](figures/13_confusion_v2.png)
 
-Progressively unfreezing the last residual block and adding light augmentation improved every metric over the frozen-head baseline and, importantly, corrected the baseline's screening-unfriendly sensitivity/specificity balance (see §8). All three configurations remain deliberately modest — this is a clean, honest baseline study, not a maximum-performance benchmark (see §9 and the Scope note in §2).
+Within that historical development comparison, progressively unfreezing the last residual block and adding light augmentation improved every reported metric over the frozen-head baseline. All three configurations remain deliberately modest - this is a baseline study, not a maximum-performance benchmark.
 
 **Fine-tuning honesty note:** the fine-tuned model's train loss drops toward zero while val loss plateaus and then drifts up (classic mild overfitting on 535 images) — so training keeps the best-validation checkpoint (epoch 9), not the last one. This is expected on a small dataset and is why the backbone is only *partially* unfrozen (`layer4`), not fully.
 
 ![v2 training curves](figures/14_training_curves_v2.png)
 
-### Robustness: 5-fold patient-level cross-validation
+### Preferred internal estimate: duplicate-aware inner/outer evaluation
 
-The single-split numbers above could be a lucky partition. A **5-fold patient-level cross-validation** (whole dataset, `GroupKFold`, best config) gives a much more trustworthy picture:
+The historical CV AUROC of `0.988 +/- 0.008` grouped supplied patient IDs, but it reused each fold for checkpoint selection and scoring, and it missed exact images duplicated under different patient IDs. It is superseded, not erased.
 
-**CV AUC = 0.988 ± 0.008** (folds: 0.995, 0.995, 0.980, 0.978, 0.991).
+The repaired protocol links patient IDs that share an exact image, counts each SHA-256 hash once, fixes the model recipe before outer evaluation, uses a separate inner validation split for checkpoint and threshold selection, and evaluates every independent outer group once.
 
-The tight spread (std 0.008 across folds) says the ~0.97–0.99 AUC is *stable across different patient partitions*, not an artifact of one split. Note this CV is a separate robustness check over the full dataset, so its folds are not independent of the held-out test set above — it answers "is performance stable?", not "here is a second untouched test."
+| Analysis level | N | AUROC (95% cluster-bootstrap CI) | Sensitivity | Specificity |
+|---|---:|---:|---:|---:|
+| **Duplicate-aware evaluation group (primary)** | **283** | **0.9904 (0.9797-0.9980)** | **0.9563** | **0.9700** |
+| Image (secondary) | 737 | 0.9837 (0.9731-0.9925) | 0.9500 | 0.9289 |
 
-![CV folds](figures/15_cv_folds.png)
+The model recipe was historically informed by HYGD, so this remains a repaired **post-development internal resampling estimate**. It supports strong in-distribution discrimination, not performance at a new hospital. Full protocol and audit: [INTERNAL_EVALUATION_REPAIR.md](INTERNAL_EVALUATION_REPAIR.md).
+
+![Historical CV folds, superseded by the repaired evaluation](figures/15_cv_folds.png)
 
 ## 6. Explainability
 
@@ -73,15 +93,15 @@ Grad-CAM (last conv block of ResNet18) on 5 correct + 5 incorrect test predictio
 ![Grad-CAM correct](figures/08_gradcam_correct.png)
 ![Grad-CAM incorrect](figures/09_gradcam_wrong.png)
 
-On the correct predictions, the heatmap concentrates on the optic disc / peripapillary region in most cases — the clinically relevant area for glaucomatous cupping, which is a reassuring sanity check (the model isn't keying off unrelated artifacts).
+On the historical development predictions, the heatmap concentrates on the optic disc / peripapillary region in many correct cases. This is a limited localization sanity signal, not evidence that the model ignores acquisition artifacts; the later dataset-origin probes show that strong source information remains encoded.
 
 A full per-error clinical write-up is in `notebooks/04_explainability.ipynb`, with all 5 errors shown as original + Grad-CAM in `figures/16_the_5_errors_annotated.png`. It separates the errors into two distinct failure modes: **localization** (in 2 of 3 misses the model's attention is off the disc — one an image-quality artifact, one a detection miss) and **interpretation** (both false alarms look at the disc but over-call, plausibly on a large physiological cup or co-existing findings). The disc descriptions there are explicitly framed as observational hypotheses for *model behaviour*, not diagnoses.
 
-**Data-driven error analysis (the checkable half).** The best model makes only 5 errors on the test set (3 missed glaucoma / false negatives, 2 false alarms / false positives). One concrete hypothesis is testable without ophthalmology input: *are errors concentrated in low-quality images?* The misclassified images have a slightly lower mean FundusQ-Net quality score (5.48 vs 6.04 for correct), but the difference is **not statistically significant** (Mann-Whitney U, one-sided, p = 0.45 — unsurprising with only 5 errors). So the errors can't simply be blamed on image quality; they're something subtler, which is exactly why the human clinical reflection still matters. See `results/error_analysis.json` and the figure below.
+**Historical data-driven error analysis.** The selected development model made 5 errors on the test split (3 missed glaucoma / false negatives, 2 false alarms / false positives). The misclassified images had a slightly lower mean FundusQ-Net quality score (5.48 vs 6.04 for correct), but the difference was **not statistically significant** (Mann-Whitney U, one-sided, p = 0.45). This small retrospective analysis does not explain the later source-shortcut findings. See `results/error_analysis.json` and the figure below.
 
 ![Error vs quality](figures/10_error_vs_quality.png)
 
-## 7. Reproducibility
+## 7. Baseline reproducibility
 
 ```bash
 python3 -m venv .venv
@@ -89,32 +109,37 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Download the dataset into `data/raw/` (see §3 above), then run the notebooks in order: `01_eda` → `02_preprocessing` → `03_baseline_model` → `04_explainability`. All figures in `figures/` and the trained model/metrics in `results/` were generated exactly this way on 2026-07-05.
+Download the dataset into `data/raw/` (see §3 above), then run the notebooks in order: `01_eda` → `02_preprocessing` → `03_baseline_model` → `04_explainability`. These instructions reproduce the original baseline workflow.
 
-## 8. Clinical interpretation
+The first failure-first reviewer packet adds the audited narrative reports but intentionally does not publish the later executable/result bundle. It therefore does not claim that the newer qualification runs are reproducible from this public snapshot alone. Start with [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md) and its Evidence Map.
 
-The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / specificity 0.97 meant it rarely raised a false alarm but still missed about 1 in 9 true glaucoma cases — the wrong trade-off direction for a *screening* tool, where a missed disease usually costs more than a false alarm that just triggers a second look. The v2 work addressed this two ways.
+## 8. Historical threshold analysis
 
-**(1) A better model.** Fine-tuning the last residual block with augmentation lifted the best model to sensitivity 0.954 / specificity 0.941 at the default 0.5 threshold — a much more screening-appropriate balance while keeping AUC highest.
+The original development analysis compared sensitivity and specificity on the 44-patient test split. It is retained to show how the threshold trade-off was explored, not to recommend a clinical operating point.
 
-**(2) The right operating threshold.** For a *screening* tool the decision threshold, not the default 0.5, is the real knob: lowering it catches more disease at the cost of more false alarms. The trade-off on the test set (best model, 65 GON+ / 34 GON-):
+The partially fine-tuned development model reported sensitivity 0.954 and specificity 0.941 at the default 0.5 threshold.
+
+The retrospective threshold sweep on that same split was:
 
 | threshold | sensitivity | specificity | missed (FN) | false alarms (FP) |
 |---|---|---|---|---|
 | 0.30 | 0.969 | 0.824 | 2 | 6 |
-| **0.40 (recommended for screening)** | **0.969** | **0.912** | **2** | **3** |
+| 0.40 (historical candidate) | 0.969 | 0.912 | 2 | 3 |
 | 0.50 (default) | 0.954 | 0.941 | 3 | 2 |
 | 0.64 | 0.938 | 0.941 | 4 | 2 |
 
-**Recommended operating point: 0.40.** It catches 63/65 glaucoma cases (2 missed vs 3 at the default) for just one extra false alarm — the sensible direction for screening, where a missed case costs more than a second look. Going lower to 0.30 buys nothing (same sensitivity, double the false alarms). This is a starting recommendation on a 44-patient test set with wide CIs — a real deployment threshold should be re-derived on a larger, external validation set with clinical input, not fixed from this data alone.
+In the repaired internal evaluation, thresholds selected independently inside the five training folds ranged from 0.483 to 0.948. That spread is a calibration warning. No fixed clinical threshold is justified by this project.
 
 ## 9. Limitations
 
-- **Generalization** was tested honestly on two external datasets (PAPILA, RIM-ONE DL): the naive model collapses to ~0.5 zero-shot, but a domain-generalization pipeline (auto disc-crop + colour-norm + multi-source training + SWA + TTA + VCDR head) recovers held-out PAPILA to **0.86 ± 0.02 across 5 seeds** (best single run 0.87 [0.82–0.91]) and, in the symmetric direction (train HYGD+PAPILA), held-out RIM-ONE to **0.92 ± 0.01** — neither held-out set is ever used for training or model selection. See [`VALIDATION.md`](VALIDATION.md) / [`validation/FINDINGS.md`](validation/FINDINGS.md). Still public-dataset data with wide CIs — not a deployable device.
-- **Small test set** — 99 images / 44 patients. Bootstrap 95% CIs are reported (§5) and are wide, so the single-split point estimates are indicative, not precise. The 5-fold patient-level cross-validation (§5, AUC 0.988 ± 0.008) mitigates this by showing stability across partitions, but every fold still comes from the same single-hospital dataset.
+- **Transportability is not established.** The PAPILA/RIM-ONE recovery chronology is adaptive development evidence. Target AUROC was displayed during development, and target anatomical resources affected preprocessing. It is not an untouched external test.
+- **The first locked source-only qualification failed.** HYGD-CEXT-1.1 produced equal-source mean AUROC 0.6227 [0.5822-0.6632]; its geometry candidate was ineligible before glaucoma-classifier training. See [SOURCE_ONLY_QUALIFICATION_REPORT.md](SOURCE_ONLY_QUALIFICATION_REPORT.md).
+- **A stronger representation did not solve the shortcut.** Frozen DINOv2 features reached equal-source mean AUROC 0.7105 [0.6746-0.7423], but dataset-origin accuracy was 0.9994 against a required value below 0.75. See [HYGD_CEXT_2_0_RESULT.md](HYGD_CEXT_2_0_RESULT.md).
+- **Bounded preprocessing did not repair source decoding.** The best fixed branch reported equal-source mean AUROC 0.7364 while origin accuracy remained 0.9933. LEACE is mechanism evidence only. See [HYGD_SHORTCUT_MAP_1_RESULT.md](HYGD_SHORTCUT_MAP_1_RESULT.md).
+- **The RIM-ONE negative control remains unresolved.** Permutation AUROC remained 0.6759-0.7513 across later branches. Its mechanism is `needs-proof` and limits interpretation of the corresponding disease AUROCs.
+- **All preferred internal evidence remains single-site.** The repaired evaluation uses 737 unique images and 283 linked groups, but every group comes from one hospital and one camera.
 - **Modest by design** — even the best model is only a partially-unfrozen ResNet18 (`layer4` + head), 10 epochs, no hyperparameter search, no architecture search. Explicitly not an attempt at maximum achievable performance (see the Scope note in §2). The point is a clean, honest, reproducible pipeline, not a leaderboard number.
-- **Threshold set for reporting, not deployment** — headline metrics use the default 0.5 threshold for comparability; §8 reports a screening-oriented threshold (sensitivity ≥ 0.95), but the final operating point for any real use should be chosen with clinical input, not fixed here.
-- **Patient-level split imbalance** — the test split ended up with a somewhat lower GON+ rate (65.7%) than train/val (~74%), a side effect of grouping by patient with a small number of patients; noted rather than hidden.
+- **Calibration and clinical utility are untested.** The historical threshold sweep is not a deployment recommendation, and no patient-impact or prospective study was performed.
 - **This is a student portfolio/research artifact, not a clinical device, and must never be used for real diagnostic decisions.**
 
 ## Repository structure
@@ -123,11 +148,20 @@ The **v1 baseline** had a screening-unfriendly balance: sensitivity 0.89 / speci
 data/raw/               # HYGD dataset (download yourself — not committed, see .gitignore)
 notebooks/              # 01_eda, 02_preprocessing, 03_baseline_model, 04_explainability
 src/                    # data_utils, train, evaluate, visualize (baseline) + experiments (v2 harness)
-run_v2_experiments.py   # trains v2 configs, bootstrap CIs, threshold analysis, 5-fold CV
+run_v2_experiments.py   # historical development comparison and threshold sweep
 analyze_errors.py       # data-driven error analysis (errors vs image quality score)
 figures/                # EDA + results + explainability + v2 comparison figures (committed)
 results/                # metrics.json, v2_comparison.json, cv_results.json, error_analysis.json,
                         #   run logs (model checkpoints are git-ignored — too large)
+HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md  # current reviewer-facing evidence map
+INTERNAL_EVALUATION_REPAIR.md         # preferred internal estimate and audit boundary
+SOURCE_ONLY_QUALIFICATION_REPORT.md   # closed HYGD-CEXT-1.1 source-only result
+HYGD_MANUAL_GEOMETRY_RESULT.md        # closed center/diameter/shortcut investigation
+HYGD_CEXT_2_0_PROTOCOL.md             # frozen DINOv2 source-only protocol
+HYGD_CEXT_2_0_EXECUTION_SPEC.md       # execution and provenance boundary
+HYGD_CEXT_2_0_RESULT.md               # failed dataset-origin gate
+HYGD_SHORTCUT_MAP_1_PROTOCOL.md       # frozen preprocessing/attribution protocol
+HYGD_SHORTCUT_MAP_1_RESULT.md         # no bounded preprocessing repair candidate
 references/             # (empty — no external papers/notes added yet)
 ```
 
