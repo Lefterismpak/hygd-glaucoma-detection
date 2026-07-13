@@ -30,3 +30,22 @@ figures/dg_crops_contact_sheet.png
 
 # training stdout logs — build artifacts, local only
 logs/
+
+# recursive research artifacts - local only, never public
+**/*.pt
+**/*.pth
+**/*.h5
+**/*.ckpt
+**/*.npy
+**/*.npz
+**/*.pkl
+**/*.joblib
+**/*contact_sheet*.png
+results/**/*predictions*.csv
+results/**/*oof*.csv
+results/**/*manifest*.csv
+artifacts/**/repository/
+artifacts/**/*.tar.gz
+
+# local design and execution notes - never public
+docs/superpowers/

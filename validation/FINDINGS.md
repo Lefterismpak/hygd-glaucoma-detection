@@ -1,5 +1,7 @@
 # GlaucoGen — External Validation Findings (PAPILA, zero-shot)
 
+> **Status correction (2026-07-14):** This file is a chronological development record. Its later recovery sections are adaptive experiments, not prospectively untouched external validation, and they do not establish a transportable glaucoma model. The current adjudicated result is the failure-first sequence summarized in [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](../HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md); the unexplained high RIM-ONE permutation AUROC remains `needs-proof`.
+
 > Run 2026-07-05. This is the honest external-validation result. It is on the
 > `external-validation` branch and **not yet published** — how/whether to surface
 > it publicly is a framing decision for the repo owner.
