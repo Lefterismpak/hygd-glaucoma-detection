@@ -1,5 +1,7 @@
 # Validation & Honesty Statement
 
+> **Status correction (2026-07-14):** The external-recovery section below is retained as historical adaptive development evidence, not as untouched external validation. Target AUROC was displayed during development, and target anatomical resources affected the preprocessing path. Later locked source-only qualifications did not establish transportability: HYGD-CEXT-1.1 failed its source evidence gate, HYGD-CEXT-2.0 failed the dataset-origin shortcut gate at 0.9994 accuracy, and the bounded preprocessing branches did not repair that signal. See [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md) for the current claim hierarchy.
+
 This document explains **why the headline numbers in this repo are trustworthy, what they do *not* claim, and exactly what would need to happen next** to make them clinically meaningful. It exists because a high AUC is easy to report and easy to inflate — the point of this project is to show the reporting is honest, not just high.
 
 All numbers below are read directly from the committed result files (`results/v2_comparison.json`, `results/cv_results.json`, `results/threshold_sweep.json`, `results/error_analysis.json`), not from memory.
