@@ -17,7 +17,7 @@ This is a diagnostic study. It is not a new qualification, a model-promotion att
 ## 2. Frozen Inputs
 
 - The 1,642 exact-hash representative rows already audited for `HYGD-CEXT-2.0`: HYGD 737, PAPILA 420, RIM-ONE DL 485.
-- The three unchanged leave-one-source-out fold manifests and subject/hash leakage controls.
+- The three unchanged leave-one-source-out fold manifests and declared evaluation-group/image-hash leakage controls. RIM-ONE biological-subject independence remains `needs-proof`.
 - The existing local official DINOv2 ViT-S/14 repository and weight receipt used by `HYGD-CEXT-2.0`.
 - The exact baseline feature matrix and primary qualification summary from `HYGD-CEXT-2.0`.
 

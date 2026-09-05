@@ -1,114 +1,118 @@
-# GlaucoGen — External Validation Findings (PAPILA, zero-shot)
+# GlaucoGen — Historical PAPILA/RIM-ONE Stress-Test and Adaptive-Development Chronology
 
-> **Status correction (2026-07-14):** This file is a chronological development record. Its later recovery sections are adaptive experiments, not prospectively untouched external validation, and they do not establish a transportable glaucoma model. The current adjudicated result is the failure-first sequence summarized in [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](../HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md); the unexplained high RIM-ONE permutation AUROC remains `needs-proof`.
+> **Status correction (2026-08-31):** This file is a chronological development record. Its external intervals used eye/image-row bootstrap, not patient-cluster bootstrap; its fine-tuning source split was row-level; RIM-ONE subject independence and mixed-source license compatibility remain `needs-proof`. Later recovery sections are target-adaptive experiments, not prospectively untouched external validation, and they do not establish a transportable glaucoma model. See [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](../HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md).
 
-> Run 2026-07-05. This is the honest external-validation result. It is on the
-> `external-validation` branch and **not yet published** — how/whether to surface
-> it publicly is a framing decision for the repo owner.
+> Historical run dated 2026-07-05. The aggregate artifact is now public with an
+> explicit `partial_with_deviations` label; row-level predictions, data, and
+> checkpoints are not published.
 
 ## Headline
 
-The HYGD model that scores **AUROC 0.988 in patient-level cross-validation** does
-**not transfer to PAPILA**: zero-shot **AUROC ≈ 0.51 (95% CI 0.44–0.58) — chance.**
-It collapses to predicting *glaucoma for almost everything* (96.7% of PAPILA eyes,
-mean P 0.93), with healthy and glaucoma probabilities essentially identical
-(healthy 0.935 vs glaucoma 0.901 — no separation). See `external_prediction_collapse.png`.
+The HYGD model whose **historical, superseded CV reported AUROC 0.988**
+showed near-chance ranking on the historical PAPILA zero-shot run: **AUROC ≈ 0.51**
+(historical noncanonical eye-row interval 0.44–0.58). The private run summary
+reported 96.7% of PAPILA eyes above its historical threshold and mean probabilities
+of 0.935 versus 0.901; those row-level values are not public and remain `needs-proof`
+beyond the aggregate artifact.
 
 | Setting | AUROC | Notes |
 |---|---|---|
-| HYGD, patient-level 5-fold CV (in-distribution) | 0.988 ± 0.008 | reported result |
-| HYGD test via `predict.py` (parity check) | 0.976 | pipeline is correct |
-| **PAPILA, zero-shot (as-trained preprocessing)** | **0.508** | CI [0.44, 0.58] |
-| PAPILA, zero-shot + field-of-view standardization | 0.58 | small bump, still near-chance |
+| HYGD, historical five-fold CV (in-distribution) | 0.988 +/- 0.008 | superseded, non-canonical result |
+| HYGD test via `predict.py` (historical parity check) | 0.976 | same-path aggregate; not proof of full pipeline correctness |
+| **PAPILA, zero-shot (as-trained preprocessing)** | **0.508** | historical eye-row interval [0.44, 0.58], noncanonical |
+| PAPILA, zero-shot + field-of-view standardization | 0.58 | private historical aggregate, `needs-proof` |
 
-## This is a real failure, not a bug — ruled out:
+## Checks performed in the historical run
 
-- **Pipeline correct:** the same `predict.py` gives AUROC 0.976 on the HYGD test set (parity gate already PASS at 2.8e-06).
-- **Labels correct:** 420 eyes = 333 healthy + 87 glaucoma (suspects excluded), matches PAPILA's published composition exactly.
-- **Not just framing:** HYGD is square (1893²), PAPILA landscape (2576×1934). Standardizing the field of view (center-square crop) only moves AUROC 0.51 → 0.58 — the failure is deeper than aspect ratio.
+- **Historical parity check:** the same `predict.py` path reported AUROC 0.976 on the HYGD development test and a maximum output difference of 2.8e-06 in a private parity run. This narrows, but does not rule out, implementation defects.
+- **Aggregate label-count check:** 420 eyes = 333 healthy + 87 glaucoma (suspects excluded), matching PAPILA's published aggregate composition. This does not independently verify row-level label semantics.
+- **Framing sensitivity:** HYGD is square while PAPILA is landscape. A private center-square sensitivity run reportedly moved AUROC from 0.51 to 0.58; that observation alone does not identify a causal mechanism.
 
 ## Interpretation (honest)
 
-The model learned features specific to HYGD (single hospital, single camera — TOPCON DRI OCT Triton — and a 73% glaucoma base rate) that do not exist or differ on PAPILA. It is saturated toward "glaucoma," consistent with the high training prevalence plus dataset-specific shortcuts. **Recalibration** (temperature/Platt) fixes the calibration dramatically (ECE 0.74 → 0.08 with Platt) but — as stated in the protocol — **cannot restore discrimination**: recalibrating a chance-level ranking is still chance.
+The observed behavior is consistent with reliance on HYGD-specific acquisition or prevalence cues, but it does not identify which features caused the drop. The historical Platt summary reported ECE 0.74 → 0.08 on a grouped but non-stratified split. That is a noncanonical development result, not proof that calibration was fixed. Monotone recalibration cannot improve AUROC ranking.
 
-This is exactly what external validation exists to reveal, and it is the norm, not the exception, for single-dataset fundus models. It is not a flaw in how the model was *built* (the in-distribution work is clean and honest); it is the true, measured limit of what one small single-hospital dataset can produce.
+This is exactly what external stress testing exists to reveal. The historical internal path was later repaired for duplicate and inner/outer separation defects; see [`../INTERNAL_EVALUATION_REPAIR.md`](../INTERNAL_EVALUATION_REPAIR.md). The zero-shot collapse remains useful development evidence, not proof of a universal limit.
 
-## Why this is a *strong* outcome for the portfolio
+## Why this is useful development evidence
 
-A student who builds a model, externally validates it, finds it collapses, and reports the collapse transparently — with the mechanism characterized — demonstrates exactly the maturity a skeptical DACH ophthalmology PI is looking for. It is a better story than a modest, cherry-picked drop. It also directly motivates real next work.
+The transparent report of an external stress-test collapse, with observed behavior separated from unproved mechanisms, is more decision-useful than a selectively reported performance drop. It directly motivates the next experiments without making an audience or prestige claim.
 
 ## Next experiments (post-freeze, if pursued)
 
 1. **Disc-centred crop + light fine-tune** (Tier-3): does a small amount of PAPILA/RIM-ONE fine-tuning on disc-standardized input recover transferable signal? (train RIM-ONE → test PAPILA, and vice-versa; never fine-tune and test on the same set.)
-2. **Shortcut-learning analysis:** Grad-CAM on PAPILA to see what the saturated model attends to — likely border/field artifacts, not the disc.
-3. Add **RIM-ONE DL** as the second external set to confirm the pattern generalizes across datasets.
+2. **Shortcut-learning analysis:** any future saliency work requires a predeclared endpoint and independent adjudication. Grad-CAM alone cannot identify a causal shortcut or distinguish border/field artifacts from disease-relevant features.
+3. Add **RIM-ONE DL** as a second stress-test set, subject to verified subject identity and use-term compatibility; a second dataset would not by itself confirm a general mechanism.
 
 ## Files
 - `results/external_papila.json` — full metrics (zero-shot + recalibration).
-- `validation/external_prediction_collapse.png` — the prediction-distribution figure.
-- `validation/make_papila_labels.py`, `validation/eval_external.py` — reproducible.
+- The legacy collapse chart was removed because its standalone labels overstated a partial historical stress test; the aggregate JSON and corrected narrative remain.
+- `validation/make_papila_labels.py` and the current hardened `validation/eval_external.py` document a reproducible prospective path; the exact historical producer and full historical run reproduction remain `needs-proof`.
 - PAPILA images are git-ignored (GPL-3.0+, not redistributed); the label CSV is derived metadata.
 
 ---
 
 ## Update — cross-dataset fine-tune (Tier-3): does a short fine-tune fix transfer? NO.
 
-Ran the honest test: fine-tune the HYGD model (layer4+fc, class-weighted, early-stopped) on ONE external dataset, evaluate on the OTHER (fully held out, never seen in fine-tuning). RIM-ONE zero-shot also confirmed the collapse generalizes (AUROC 0.606, still saturates — sens 1.0 / spec 0.0).
+The historical experiment fine-tuned the HYGD model (layer4+fc, class-weighted, early-stopped) on one external dataset and evaluated aggregate disease metrics on the other. Target disease rows were not used for the corresponding fine-tune, but the source validation split was row-level, broader target results were visible, and RIM-ONE subject identity was not verified. The RIM-ONE zero-shot aggregate was AUROC 0.606; it does not confirm a general mechanism.
 
 | Fine-tune direction | target zero-shot | target after fine-tune | Δ | source-val (fit) |
 |---|---|---|---|---|
 | RIM-ONE → PAPILA | 0.508 | **0.683** | +0.18 | 0.961 |
 | PAPILA → RIM-ONE | 0.606 | **0.467** | −0.14 | 0.925 |
 
-**Verdict: fine-tuning on one dataset does NOT produce a model that transfers to another.** The best case (RIM-ONE→PAPILA) recovers to only 0.68 — still weak; the other direction actually *degrades* below chance (0.47). Crucially, the model fits each source dataset excellently (val AUROC 0.92–0.96) — so glaucoma IS learnable in each set individually. The failure is specifically **transfer**: each dataset teaches the model dataset-specific shortcuts (camera, field, processing), not universal glaucoma features.
+**Verdict: this fine-tuning experiment did NOT produce a model that transferred to the other dataset.** The best case (RIM-ONE→PAPILA) recovers to only 0.68 — still weak; the other direction actually *degrades* below chance (0.47). The high source-validation fit with poor transfer is consistent with source-specific shortcut reliance and is insufficient evidence of source-invariant disease features; it does not prove that no universal signal exists.
 
 ## Complete, honest conclusion
 
-A single small single-hospital dataset — even with fine-tuning on a second external set — is **not enough to build a glaucoma model that generalizes across fundus datasets.** In-distribution AUROC 0.988 is real but does not survive contact with other cameras/populations. This is consistent with the literature and is precisely why the field moved to foundation models (e.g. RETFound) pretrained on very large multi-dataset corpora. It is not a flaw in how this model was built; it is the honest ceiling of the data.
+A single small single-hospital dataset — even with fine-tuning on a second external set — did **not** establish a glaucoma model that transports across sources. The historical, superseded in-distribution CV AUROC 0.988 did not predict the zero-shot result on other cameras/populations. This is a project-specific finding, not proof of an absolute data ceiling.
 
 ---
 
-## Update 2 — the fix: cross-dataset generalization RECOVERED (held-out PAPILA 0.51 → 0.83)
+## Update 2 — adaptive benchmark recovery (PAPILA 0.51 → 0.83)
 
-After the zero-shot collapse and the failed naive fine-tune, a literature-grounded domain-generalization pipeline (anchored on G-RISK, npj Digit Med 2023) **recovers genuine transfer to fully-held-out PAPILA** — which is never used for training OR model selection.
+> **Evidence boundary:** Every recovery result below is adaptive, mechanism-supporting development evidence. It does not establish transportability; the later locked HYGD-CEXT-1.1 and HYGD-CEXT-2.0 qualifications did not establish it either.
+
+After the zero-shot collapse and failed naive fine-tune, a literature-grounded domain-generalization pipeline improved the PAPILA adaptive benchmark. PAPILA disease labels were excluded from the loss and source-validation checkpoint criterion in the final runs, but target AUROC was displayed during development and target anatomical resources affected preprocessing; this is not confirmatory transfer.
 
 | Stage | Held-out PAPILA AUROC |
 |---|---|
 | Zero-shot (original failure) | 0.508 |
 | Single-source naive fine-tune | 0.683 |
-| + disc-crop + colour-norm + multi-source + SWA | 0.794 [0.74–0.84] |
-| **+ test-time augmentation (final)** | **0.825 [0.77–0.87]** |
+| + disc-crop + colour-norm + multi-source + SWA | 0.794 [historical eye-row interval 0.74–0.84] |
+| **+ test-time augmentation (historical run)** | **0.825 [historical eye-row interval 0.77–0.87]** |
 
-![recovery](../figures/dg_recovery.png)
+The legacy recovery chart was removed because its standalone headline overstated the current evidence boundary; the corrected adaptive chronology below is the public record.
 
-**What fixed it (each lever is principled and target-free):**
-1. **Automatic disc-centred, disc-size-standardized cropping** — the dominant lever. A U-Net disc segmenter (trained on PAPILA+RIM-ONE masks, val Dice 0.958) localizes the optic disc on every image (including maskless HYGD); each image is cropped to a square of 2.2× disc diameter so the disc-to-frame ratio is identical across datasets, destroying the field-of-view / bezel / zoom shortcut.
-2. **Colour/illumination normalization** — Shades-of-Gray colour constancy + CLAHE, applied identically at train and test, to neutralize camera colour-cast.
-3. **Multi-source training** — train on HYGD + RIM-ONE (two domains) with domain- and class-balanced sampling + a base-rate fix, so "which dataset" stops being a usable cue. PAPILA is fully held out.
+**Historical adaptive recipe (the final-run operations were label-free, but the development process was not target-blind):**
+1. **Automatic disc-centred, disc-size-standardized cropping.** A U-Net disc segmenter trained on PAPILA+RIM-ONE masks reported validation Dice 0.958 in private development. Crops used a square of 2.2× estimated disc diameter. This does not prove successful localization for every image or elimination of field-of-view shortcuts.
+2. **Colour/illumination normalization** — Shades-of-Gray colour constancy + CLAHE, applied identically at train and test, intended to reduce camera colour-cast.
+3. **Multi-source training** — train on HYGD + RIM-ONE (two domains) with domain- and class-balanced sampling + a base-rate fix. PAPILA disease images were excluded from the final training loss, while target metrics/resources had already influenced the development chronology.
 4. **Heavy colour/geometry augmentation** — pushes the model toward camera-invariant morphology.
-5. **SWA (stochastic weight averaging)** for model selection — target-free; averages out the source-overfitting that made the single best-source-val checkpoint transfer poorly.
+5. **SWA (stochastic weight averaging)** for source-validation model selection — label-free within each final run; it does not undo earlier target visibility.
 6. **Test-time augmentation** — label-free averaging over flips/rotations at inference.
 
-**Honesty guardrails held throughout:** PAPILA glaucoma labels were used ONLY to compute the final AUROC — never for training, hyperparameters, or model selection (SWA + TTA are both target-free). Disc masks are a preprocessing *input* (localizer), not labels. Patient-grouped splits; no dataset images redistributed (only code + metrics + figures are public).
+**Updated guardrail interpretation:** PAPILA disease labels were excluded from the training loss and source-validation checkpoint criterion in the final runs. However, target AUROC was displayed during development and target anatomical resources entered preprocessing. Patient-grouped splits and non-redistribution still matter, but they do not convert this adaptive chronology into untouched external validation.
 
-**Honest caveats.** PAPILA is one dataset (210 patients) and the CI is wide (0.77–0.87). 0.83 is a genuine cross-dataset result, not the 0.988 in-distribution number — but it is real generalization, achieved by fixing the pipeline rather than hiding the failure. The dataset-probe still shows residual separability (~0.90), so further gains (a VCDR-regression head, a retinal foundation backbone) are the documented next levers.
+**Honest caveats.** PAPILA contains both eyes from 210 patients; the historical 0.77–0.87 interval resampled eye rows and is not a patient-cluster CI. The 0.83 adaptive benchmark is not the historical, superseded 0.988 in-distribution CV and is not confirmatory generalization. A private dataset probe reportedly showed residual source separability near 0.90 (`needs-proof`).
 
-## Reproduce
-`validation/build_disc_coords.py` (disc localization) → `validation/build_crops.py` (crop + colour-norm + dataset-probe gate) → `validation/train_generalize.py` (multi-source + SWA). Metrics in `results/generalize_attemptA.json`.
+## Historical execution path (inputs are not public)
+
+`validation/build_disc_coords.py` (disc localization) → `validation/build_crops.py` (crop + colour-norm + dataset-probe gate) → historical `validation/train_generalize.py` route. The current script is prospectively hardened, writes to a new patient-aware namespace, and must not be treated as the exact producer of every field in `results/generalize_attemptA.json`; the historical TTA producer is `needs-proof`.
 
 ### Update 3 — VCDR auxiliary head (Attempt B): held-out PAPILA 0.825 → 0.871
 
-Adding a vertical cup-to-disc-ratio (VCDR) regression head to the multi-source model pushes held-out PAPILA AUROC to **0.871 [0.82–0.91]**. VCDR is a continuous, camera-independent glaucoma-morphology target (VCDR alone separates glaucoma at AUROC 0.96 on RIM-ONE and 0.81 on held-out PAPILA), so forcing the shared backbone to also predict it pulls features onto cupping rather than dataset texture — exactly the change most credited for G-RISK's transfer. VCDR is supervised ONLY where reliable (RIM-ONE expert masks; HYGD's U-Net-predicted VCDR is noisy on its SLO-derived images, so HYGD is masked out of the VCDR loss but still trains the classifier). PAPILA remains fully held out; SWA + TTA are target-free. A cup+disc U-Net (val Dice ~0.95/channel) provides the masks. `results/generalize_attemptB.json`. (Point estimates are single-run with test-set bootstrap CIs; the A→B lift is consistent with the VCDR mechanism.)
+Adding a vertical cup-to-disc-ratio (VCDR) regression head in the historical multi-source run produced a PAPILA adaptive benchmark of **0.871** with a noncanonical eye-row interval **[0.82–0.91]**. VCDR was supervised from RIM-ONE masks while HYGD was masked out of that auxiliary loss. PAPILA disease images were excluded from the final training loss, but target AUROC and anatomical resources were part of the wider development history; mixed-source license compatibility remains `needs-proof`. `results/generalize_attemptB.json`.
 
 ---
 
-## Update 4 — seed robustness + symmetric external validation
+## Update 4 — seed robustness + symmetric adaptive check
 
-The Attempt-B headline (0.871) was a single run. Two things were then checked:
-is it seed-lucky, and does the same target-free recipe generalize in the *reverse*
+The Attempt-B headline (0.871) was a single run. Two adaptive checks followed:
+seed sensitivity, and the same disease-label-held-out recipe in the reverse
 direction? Each seed varies weight init, augmentation, sampler, AND the source
 train/val split (`--seed` → `torch.manual_seed` + `np.random.seed` +
-`GroupShuffleSplit`). Seed 0 reproduces the published 0.8708 exactly.
+historical `GroupShuffleSplit`). The checked-in seed-0 summary matches 0.8708 numerically, but the exact historical producer identity remains `needs-proof`.
 
 **(a) Seed robustness — held-out PAPILA (forward: train HYGD+RIM-ONE):**
 
@@ -119,16 +123,19 @@ train/val split (`--seed` → `torch.manual_seed` + `np.random.seed` +
 | 2 | 0.850 |
 | 3 | 0.884 |
 | 4 | 0.845 |
-| **mean ± std** | **0.857 ± 0.019** (range 0.838–0.884) |
+| **sample mean ± sample SD** | **0.857 ± 0.019** (range 0.838–0.884; descriptive, not a CI) |
 
-The generalization is **robust to seed** — every run clears 0.83, far above
-zero-shot (0.51) and single-source fine-tune (0.68). The published 0.871 sits
-near the top of the distribution, so the honest point estimate is **0.86 ± 0.02**.
+The adaptive benchmark is stable across these five seeds — every run clears
+0.83, above the earlier zero-shot and single-source values. The published 0.871
+sits near the top of these five runs; the descriptive summary is **0.86 +/- 0.02 sample SD**, not a confidence interval.
 
 **(b) Symmetric direction — held-out RIM-ONE (reverse: train HYGD+PAPILA):**
 
-Same pipeline, roles swapped: RIM-ONE held out entirely; VCDR supervised on
-PAPILA expert contours (HYGD masked out). RIM-ONE never used for training/selection.
+Same pipeline, roles swapped: RIM-ONE disease images were excluded from the
+final training loss; VCDR was supervised on values derived from PAPILA's
+dataset-provided two-grader contours (HYGD masked out). This historical selection
+rule does not independently establish measurement validity or reliability. This
+direction remains adaptive because the broader target history was visible.
 
 | seed | held-out RIM-ONE AUROC (TTA) |
 |---|---|
@@ -137,18 +144,22 @@ PAPILA expert contours (HYGD masked out). RIM-ONE never used for training/select
 | 2 | 0.922 |
 | 3 | 0.900 |
 | 4 | 0.922 |
-| **mean ± std** | **0.915 ± 0.012** (range 0.900–0.927) |
+| **sample mean ± sample SD** | **0.915 ± 0.012** (range 0.900–0.927; descriptive, not a CI) |
 
-Held-out RIM-ONE recovers from zero-shot 0.61 to **0.915 ± 0.012**. Both held-out
-directions generalize well above chance → the fix **generalizes across datasets**,
-it is not tuned to PAPILA.
+The RIM-ONE adaptive benchmark changed from zero-shot 0.61 to a five-run descriptive mean of **0.915 +/- 0.012 sample SD**.
+The bidirectional pattern is mechanism-supporting evidence, not proof of
+prospective transportability or absence of target-informed development.
 
 **Honest caveat.** Held-out RIM-ONE scores higher than held-out PAPILA. RIM-ONE DL
 is distributed as tightly disc-cropped images and has higher glaucoma prevalence
 (0.35 vs 0.21), both of which plausibly make it an easier held-out target. The
-claim is **bidirectional recovery**, not that the two datasets are equally hard.
+observation is **bidirectional adaptive recovery**, not that the two datasets are
+equally hard or that transportability is established.
 
-Reproduce: `validation/train_generalize_vcdr.py --seed {0..4}` (forward) and
-`validation/train_generalize_vcdr_reverse.py --seed {0..4}` (reverse);
-aggregate with `validation/aggregate_seeds.py` / `aggregate_seeds_reverse.py`.
-Summaries: `results/seed_robustness_attemptB.json`, `results/seed_robustness_reverse.json`.
+Historical execution references: `validation/train_generalize_vcdr.py --seed {0..4}`
+(forward) and `validation/train_generalize_vcdr_reverse.py --seed {0..4}`
+(reverse), aggregated by `validation/aggregate_seeds.py` and
+`aggregate_seeds_reverse.py`. The current scripts are prospectively hardened and
+write to a new patient-aware namespace; they do not retroactively validate the
+historical summaries in `results/seed_robustness_attemptB.json` and
+`results/seed_robustness_reverse.json`.

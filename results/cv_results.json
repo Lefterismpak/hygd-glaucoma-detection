@@ -1,4 +1,13 @@
 {
+  "_provenance": {
+    "status": "historical_superseded_cv",
+    "canonical_internal_estimate": false,
+    "evaluation_unit": "image_row",
+    "supplied_patient_grouping": true,
+    "exact_cross_patient_duplicate_linkage": false,
+    "inner_outer_separation": false,
+    "warning": "The configuration was chosen after a development-test comparison and each fold was reused for checkpoint selection and scoring. Use the duplicate-aware inner/outer evaluator instead."
+  },
   "config": "finetune_layer4_aug",
   "fold_aucs": [
     0.9954361054766734,

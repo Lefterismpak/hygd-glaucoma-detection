@@ -1,4 +1,21 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Target AUROC was visible during the wider development chronology; this run is adaptive evidence only."
+  },
+  "_uncertainty_provenance": {
+    "status": "historical_image_row_bootstrap_noncanonical",
+    "resampling_unit": "eye_row",
+    "cluster_unit": "patient",
+    "patient_cluster_interval": false,
+    "n_bootstrap": 2000,
+    "seed": 42,
+    "warning": "Both eyes from a patient were sampled independently; the interval may understate uncertainty."
+  },
   "attempt": "B_multitask_VCDR",
   "seed": 0,
   "held_out_papila_auroc_TTA": 0.8708,
@@ -7,6 +24,6 @@
     0.909
   ],
   "vcdr_weight": 0.5,
-  "vcdr_supervised_on": "RIM-ONE only (reliable); HYGD masked out",
+  "vcdr_supervised_on": "RIM-ONE only (dataset-provided mask-derived VCDR; historical auxiliary-label rule); HYGD masked out",
   "attempt_A_was": 0.8251
 }

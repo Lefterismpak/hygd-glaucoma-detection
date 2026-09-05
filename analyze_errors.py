@@ -1,11 +1,9 @@
-"""Data-driven error analysis: are misclassifications concentrated in low-quality images?
+"""Reproduce a historical post-hoc quality/error comparison locally.
 
-This is the *quantitative* half of the Phase-5 clinical error analysis. It does NOT
-replace the human/ophthalmology reflection (still a TODO in notebook 04) — it just
-tests one concrete, checkable hypothesis: does the model fail more on images the
-FundusQ-Net quality score already flags as poor? If yes, that's a real, honest
-explanation for a chunk of the errors (and an argument for a quality gate at
-inference time). If no, the errors are about something subtler than image quality.
+This selected development-split analysis is underpowered, image-level despite
+repeated-patient structure, and unadjusted for selection or multiplicity. It
+provides no evidence for or against a quality/error association and cannot justify
+a quality threshold, preprocessing rule, clinical mechanism, or deployment claim.
 
 Usage (venv active, from project root):
     python analyze_errors.py --model results/finetune_layer4_aug.pt --mode finetune_layer4
@@ -13,7 +11,9 @@ Usage (venv active, from project root):
 """
 
 import argparse
+import io
 import json
+from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
@@ -25,6 +25,15 @@ from torch.utils.data import DataLoader
 
 from src.data_utils import load_dataset_metadata, train_val_test_split
 from src.experiments import TransformHYGDDataset, build_model, build_transforms
+from validation.evaluation_utils import (
+    assert_fresh_output_bundle,
+    atomic_write_bytes,
+    atomic_write_text,
+    load_torch_state_dict_safely,
+    resolve_private_output_path,
+)
+
+ROOT = Path(__file__).resolve().parent
 
 
 @torch.no_grad()
@@ -41,15 +50,37 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="results/finetune_layer4_aug.pt")
     ap.add_argument("--mode", default="finetune_layer4")
+    ap.add_argument(
+        "--out",
+        default="results/historical_notebook_runs/error_analysis.json",
+    )
+    ap.add_argument(
+        "--figure-out",
+        default="figures/local/error_vs_quality.png",
+    )
     args = ap.parse_args()
 
-    df = load_dataset_metadata("data/raw")
+    output_path = resolve_private_output_path(
+        ROOT, args.out, "results/historical_notebook_runs"
+    )
+    figure_path = resolve_private_output_path(
+        ROOT, args.figure_out, "figures/local"
+    )
+    assert_fresh_output_bundle([output_path, figure_path])
+
+    df = load_dataset_metadata(ROOT / "data/raw")
     _, _, test_df = train_val_test_split(df, seed=42)
     test_df = test_df.reset_index(drop=True)
 
     loader = DataLoader(TransformHYGDDataset(test_df, build_transforms(train=False)), batch_size=32)
-    model = build_model(mode=args.mode)
-    model.load_state_dict(torch.load(args.model, map_location="cpu"))
+    model = build_model(mode=args.mode, pretrained=False)
+    checkpoint = Path(args.model)
+    if not checkpoint.is_absolute():
+        checkpoint = ROOT / checkpoint
+    state, checkpoint_sha256 = load_torch_state_dict_safely(
+        checkpoint, map_location="cpu"
+    )
+    model.load_state_dict(state)
 
     y_prob = predict(model, loader)
     y_true = test_df["label"].values
@@ -60,14 +91,24 @@ def main():
     q_wrong = test_df.loc[~correct, "quality_score"].values
 
     result = {
-        "model": args.model,
+        "_provenance": {
+            "status": "historical_single_split_post_hoc_artifact",
+            "canonical_internal_estimate": False,
+            "row_level_artifact": False,
+            "warning": (
+                "Underpowered image-level post-hoc comparison; no evidence for or "
+                "against a quality/error association and no quality gate justified."
+            ),
+        },
+        "checkpoint": "operator_supplied_local_weights_only_state_dict",
+        "checkpoint_sha256": checkpoint_sha256,
         "n_correct": int(correct.sum()),
         "n_wrong": int((~correct).sum()),
         "mean_quality_correct": float(np.mean(q_correct)) if len(q_correct) else None,
         "mean_quality_wrong": float(np.mean(q_wrong)) if len(q_wrong) else None,
     }
 
-    # Mann-Whitney U: is the quality-score distribution of wrong predictions lower?
+    # Historical exploratory one-sided comparison; not a confirmatory hypothesis test.
     if len(q_wrong) >= 2 and len(q_correct) >= 2:
         stat, p = mannwhitneyu(q_wrong, q_correct, alternative="less")
         result["mannwhitney_u"] = float(stat)
@@ -79,8 +120,7 @@ def main():
     result["false_negatives_missed_glaucoma"] = fn
     result["false_positives_false_alarm"] = fp
 
-    with open("results/error_analysis.json", "w") as f:
-        json.dump(result, f, indent=2)
+    atomic_write_text(output_path, json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 
     # Figure: quality score distribution, correct vs wrong
@@ -92,12 +132,14 @@ def main():
     ax.axvline(np.mean(q_wrong), color="#C44E52", linestyle="--")
     ax.set_xlabel("FundusQ-Net quality score")
     ax.set_ylabel("Count")
-    ax.set_title("Image quality: correct vs misclassified test images")
+    ax.set_title("HISTORICAL DEVELOPMENT ARTIFACT — NONCANONICAL")
     ax.legend()
     plt.tight_layout()
-    plt.savefig("figures/10_error_vs_quality.png", dpi=150)
+    figure_bytes = io.BytesIO()
+    plt.savefig(figure_bytes, format="png", dpi=150)
     plt.close()
-    print("saved figures/10_error_vs_quality.png")
+    atomic_write_bytes(figure_path, figure_bytes.getvalue())
+    print(f"saved local-only figure to {figure_path}")
 
 
 if __name__ == "__main__":

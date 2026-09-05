@@ -12,6 +12,11 @@ results/*.pt
 results/*.h5
 results/*.ckpt
 
+# repaired internal-evaluation outputs — may contain hashes, patient IDs, folds,
+# thresholds, or row-level predictions; keep every filename variant local
+results/internal_evaluation_repair*
+results/patient_aware/
+
 .DS_Store
 
 # personal strategy/context — local only, never public
@@ -27,6 +32,13 @@ validation/data/
 
 # contains dataset-derived fundus crops (RIM-ONE no-redistribution) — local only
 figures/dg_crops_contact_sheet.png
+
+# generated visual and row-level review outputs are local-only publication inputs
+figures/*.png
+figures/local/
+validation/external_prediction_collapse.png
+results/error_review_indices.json
+results/historical_notebook_runs/
 
 # training stdout logs — build artifacts, local only
 logs/
@@ -49,3 +61,23 @@ artifacts/**/*.tar.gz
 
 # local design and execution notes - never public
 docs/superpowers/
+
+# private frozen-protocol sources and row/prediction/model receipts — local only
+# documents expose aggregate hashes only, never these local evidence objects
+/data/hygd_manual_disc_centers.csv
+/data/hygd_boundary_annotations_v1.csv
+/validation/HYGD_BOUNDARY_ADJUDICATION_V1.md
+/validation/confirmatory_protocol_lock_v*.json
+/validation/hygd_cext_2_0_protocol_lock.json
+/validation/hygd_cext_2_0_execution_lock.json
+/validation/cext_2_0.py
+/validation/audit_cext_2_0.py
+/validation/make_hygd_boundary_adjudication_overlays.py
+/validation/evaluate_hygd_scale_calibration_feasibility.py
+/artifacts/dinov2_vits14_receipt/
+/results/confirmatory/
+/results/cext_2_0/
+/results/shortcut_map_1/
+/results/hygd_boundary_adjudication_v1*
+/results/hygd_scale_calibration_feasibility.json
+/results/source_only_localizer_forward_manual_source_prep.json

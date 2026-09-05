@@ -1,4 +1,27 @@
 {
+  "_evidence_status": {
+    "status": "historical_locked_zero_shot_stress_test",
+    "target_blind_for_this_locked_run": true,
+    "transportability_established": false,
+    "full_protocol_compliance": false,
+    "protocol_execution_status": "partial_with_deviations",
+    "license": "GPL-3.0+",
+    "license_source": "https://figshare.com/articles/dataset/PAPILA/14798004",
+    "redistribution_of_derived_material": "needs-proof",
+    "external_claim_permitted": false
+  },
+  "evaluation_unit": "eye",
+  "subject_independence": "patient_ids_available",
+  "_uncertainty_provenance": {
+    "field": "zero_shot.auroc_95ci",
+    "status": "historical_image_row_bootstrap_noncanonical",
+    "resampling_unit": "eye_row",
+    "cluster_unit": "patient",
+    "patient_cluster_interval": false,
+    "n_bootstrap": 2000,
+    "seed": 42,
+    "warning": "Both eyes from a patient were sampled independently, so this interval may understate uncertainty."
+  },
   "dataset": "PAPILA",
   "n": 420,
   "n_patients": 210,
@@ -10,7 +33,7 @@
       0.5812
     ],
     "auprc": 0.2283,
-    "at_0.40": {
+    "historical_test_derived_threshold_0_40_nondeployment": {
       "sensitivity": 0.9425,
       "specificity": 0.018,
       "confusion_tn_fp_fn_tp": [
@@ -24,17 +47,19 @@
     "brier_raw": 0.7205
   },
   "recalibration": {
-    "note": "AUROC is invariant to monotone recalibration \u2014 the win here is calibration/threshold, not discrimination.",
+    "note": "Historical grouped but non-stratified calibration split. The Platt coefficient/direction was not recorded, so monotonicity and full protocol compliance are needs-proof.",
     "temperature": 81.392,
     "eval_ece_raw": 0.7183,
     "eval_ece_temp": 0.2866,
     "eval_ece_platt": 0.0784,
     "eval_brier_raw": 0.7015,
     "eval_brier_temp": 0.2578,
-    "threshold_for_sens>=0.90": {
+    "threshold_selected_on_calibration_split_targeting_sensitivity_gte_0_90": {
       "threshold": 0.653,
+      "target_sensitivity": 0.9,
       "eval_sensitivity": 0.8676,
-      "eval_specificity": 0.0487
+      "eval_specificity": 0.0487,
+      "target_met_on_evaluation_split": false
     }
   }
 }

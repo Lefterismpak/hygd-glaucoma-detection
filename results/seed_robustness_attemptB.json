@@ -1,6 +1,21 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Target AUROC was visible during the wider development chronology; seed stability is mechanism-supporting only."
+  },
+  "_uncertainty_provenance": {
+    "status": "descriptive_sample_sd_across_five_adaptive_runs",
+    "uncertainty_measure": "sample_standard_deviation",
+    "confidence_interval": false,
+    "seed_only_run_family_identity": "needs-proof",
+    "warning": "The mean plus or minus sample SD is descriptive, not a confidence interval or transportability estimate."
+  },
   "attempt": "B_multitask_VCDR",
-  "metric": "held_out_PAPILA_AUROC_TTA (PAPILA never used for training/selection)",
+  "metric": "adaptive_PAPILA_AUROC_TTA",
   "n_seeds": 5,
   "seeds": [
     0,
@@ -20,5 +35,5 @@
   "std": 0.0193,
   "min": 0.8375,
   "max": 0.884,
-  "note": "std is seed-to-seed training stochasticity; each run also carries a within-run bootstrap 95% CI on the test set (see per-seed files)."
+  "note": "std is descriptive sample SD across five target-visible adaptive runs, not a confidence interval; per-seed intervals are historical eye-row bootstraps, not patient-cluster intervals."
 }

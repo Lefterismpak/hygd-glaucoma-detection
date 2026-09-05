@@ -1,4 +1,13 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "source_patient_disjoint_split": "needs-proof_for_historical_run",
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Historical source splitting was row-level and target outcomes were displayed; this is not transportability evidence."
+  },
   "source": "RIMONE",
   "target": "PAPILA",
   "target_auroc_zero_shot": 0.5077,
