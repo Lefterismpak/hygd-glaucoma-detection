@@ -1,6 +1,22 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Target AUROC was visible during the wider development chronology; seed stability is mechanism-supporting only."
+  },
+  "_uncertainty_provenance": {
+    "status": "descriptive_sample_sd_across_five_adaptive_runs",
+    "uncertainty_measure": "sample_standard_deviation",
+    "confidence_interval": false,
+    "seed_only_run_family_identity": "needs-proof",
+    "subject_independence": "needs-proof",
+    "warning": "The mean plus or minus sample SD is descriptive, not a confidence interval or transportability estimate."
+  },
   "attempt": "B_reverse_multitask_VCDR",
-  "metric": "held_out_RIMONE_AUROC_TTA (RIM-ONE never used for training/selection)",
+  "metric": "adaptive_RIMONE_AUROC_TTA",
   "n_seeds": 5,
   "seeds": [
     0,
@@ -21,5 +37,5 @@
   "min": 0.9001,
   "max": 0.9265,
   "zero_shot_rimone_was": 0.606,
-  "note": "Symmetric to forward (held-out PAPILA). std = seed-to-seed training stochasticity."
+  "note": "Reverse adaptive chronology. std is descriptive sample SD across five target-visible runs, not a confidence interval; RIM-ONE subject independence remains needs-proof."
 }

@@ -1,7 +1,30 @@
 {
+  "_evidence_status": {
+    "status": "historical_locked_zero_shot_stress_test",
+    "target_blind_for_this_locked_run": true,
+    "transportability_established": false,
+    "full_protocol_compliance": false,
+    "protocol_execution_status": "partial_with_deviations",
+    "license_scope": "research_and_education_only_no_redistribution",
+    "license_source": "https://github.com/miag-ull/rim-one-dl",
+    "mixed_source_license_compatibility": "needs-proof",
+    "external_claim_permitted": false
+  },
+  "evaluation_unit": "image",
+  "subject_independence": "needs-proof",
+  "_uncertainty_provenance": {
+    "field": "zero_shot.auroc_95ci",
+    "status": "historical_image_row_bootstrap_noncanonical",
+    "resampling_unit": "image_row",
+    "cluster_unit": "verified_subject_id_unavailable",
+    "patient_cluster_interval": false,
+    "n_bootstrap": 2000,
+    "seed": 42,
+    "warning": "The loader derived identifiers from image stems; subject independence and grouped uncertainty remain needs-proof."
+  },
   "dataset": "RIMONE",
   "n": 485,
-  "n_patients": 485,
+  "historical_image_count_reported_as_patient_count": 485,
   "prevalence": 0.354639175257732,
   "zero_shot": {
     "auroc": 0.6062,
@@ -10,7 +33,7 @@
       0.6562
     ],
     "auprc": 0.4306,
-    "at_0.40": {
+    "historical_test_derived_threshold_0_40_nondeployment": {
       "sensitivity": 1.0,
       "specificity": 0.0,
       "confusion_tn_fp_fn_tp": [
@@ -24,17 +47,19 @@
     "brier_raw": 0.6103
   },
   "recalibration": {
-    "note": "AUROC is invariant to monotone recalibration \u2014 the win here is calibration/threshold, not discrimination.",
+    "note": "Historical grouped but non-stratified calibration split. Subject grouping and the Platt coefficient/direction were not verified, so monotonicity and full protocol compliance are needs-proof.",
     "temperature": 54.846,
     "eval_ece_raw": 0.636,
     "eval_ece_temp": 0.1873,
     "eval_ece_platt": 0.0616,
     "eval_brier_raw": 0.6233,
     "eval_brier_temp": 0.2578,
-    "threshold_for_sens>=0.90": {
+    "threshold_selected_on_calibration_split_targeting_sensitivity_gte_0_90": {
       "threshold": 0.983,
+      "target_sensitivity": 0.9,
       "eval_sensitivity": 0.8621,
-      "eval_specificity": 0.2812
+      "eval_specificity": 0.2812,
+      "target_met_on_evaluation_split": false
     }
   }
 }

@@ -1,4 +1,6 @@
 
+STATUS CORRECTION (2026-08-30): historical development log only. The 0.988 CV is superseded/noncanonical because configuration choice used the development test and each fold was reused for checkpoint selection and scoring. Use validation/internal_evaluation_repair.py.
+
 === training frozen_aug (mode=frozen) ===
     epoch 1/10  train=0.5244  val=0.4178
     epoch 2/10  train=0.3470  val=0.3099

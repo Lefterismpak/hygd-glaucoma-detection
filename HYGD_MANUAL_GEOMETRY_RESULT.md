@@ -10,11 +10,11 @@
 
 ## Answer
 
-The manual-source localizer learned optic-disc **center** well but did not learn anatomical **diameter**. Its masks inherited the synthetic training diameter, so the resulting crops remain too large and highly dataset-separable. A one-scalar post-hoc correction can repair geometry on the same 36 images, but it does not repair the dataset shortcut. The scalar-only lane is therefore closed.
+In a post-lock exploratory 36-image manual-reference audit, the predeclared center-error criterion passed, whereas the diameter and combined-geometry criteria failed. The original diameter labels were algorithmically fixed at 25% of image size. A scalar estimated and evaluated on the same subset improved descriptive geometry metrics but did not pass the subsequent dataset-origin gate. This is resubstitution and mechanism-supporting negative evidence only—not independent localization validation, an anatomical ground-truth study, or a qualified preprocessing repair. No classifier was authorized.
 
 ## Locked Evaluation
 
-All 36 preselected, subject-disjoint images were accepted under the blinded five-click annotation contract. The locked evaluator verified the manifest, prediction, script, lock, and annotation hashes before computing the predeclared metrics.
+All 36 preselected, linked-evaluation-group-disjoint images were accepted under the blinded five-click annotation contract. Here, disjointness is defined by supplied HYGD IDs plus exact-hash links; it is not independent proof of biological-subject identity. The locked evaluator verified the manifest, prediction, script, lock, and annotation hashes before computing the predeclared metrics.
 
 | Metric | Result | Gate | Decision |
 |---|---:|---:|---|
@@ -25,7 +25,7 @@ All 36 preselected, subject-disjoint images were accepted under the blinded five
 | Median center error | 0.0778 reference diameters | <=0.50 | pass |
 | Median diameter ratio | 1.7583 | 0.75-1.30 | fail |
 
-Twelve predictions were above the per-image 1.80 diameter-ratio ceiling, one (`93_0`) was below 0.50, and one (`114_2`) was missing. These outcomes are retained; no image was replaced.
+Twelve predictions were above the per-image 1.80 diameter-ratio ceiling, one was below 0.50, and one was missing. These aggregate outcomes are retained; no image was replaced.
 
 ## Deterministic Overlay Review
 
@@ -33,11 +33,11 @@ The 36-tile overlay shows the human center/boundary in green and the frozen pred
 
 - orange and green centers generally coincide;
 - the orange diameter is systematically larger across the set;
-- `93_0` is a genuine opposite-direction outlier in the recorded evidence;
-- `114_2` remains visibly marked as missing;
+- one case is an opposite-direction outlier in the private recorded evidence;
+- one case remains marked as missing in the private overlay;
 - no post-lock annotation, threshold, sample, or prediction was changed.
 
-Overlay: `results/hygd_boundary_adjudication_v1_overlay.png`
+The row-level overlay is private and is not included in the public repository.
 
 SHA-256: `63e76f3cc79fbef212b45c802158189235575f7ac7858f55f95bc337d53c53be`
 
@@ -45,13 +45,13 @@ SHA-256: `63e76f3cc79fbef212b45c802158189235575f7ac7858f55f95bc337d53c53be`
 
 The earlier 100 `data/hygd_manual_disc_centers.csv` records were center clicks with a synthetic diameter equal to exactly `0.25 * max(image_width, image_height)` in 100/100 images. The localizer was trained against circular masks built from those values.
 
-The new anatomical annotations resolve the old `needs-proof` diameter question:
+The new anatomical annotations narrow the old `needs-proof` diameter question:
 
 - synthetic training diameter fraction: exactly 0.2500;
 - frozen prediction median fraction: 0.2542;
 - human reference-diameter median fraction: 0.1427 (IQR 0.1346-0.1502).
 
-The model therefore reproduced its training target. This is a label-design failure for scale, not evidence that the center localizer failed.
+The values are consistent with reproduction of the fixed scale target and support a label-design-failure hypothesis for scale. They are not causal proof and do not show that the center localizer failed.
 
 ## Scalar-Only Feasibility
 
@@ -73,7 +73,7 @@ Therefore anatomical scale correction alone does not remove the dominant dataset
 2. Close the manual-source scalar-only lane; do not train a glaucoma classifier from this manifest.
 3. Do not ask for more HYGD boundary clicks merely to reconfirm the same scale factor.
 4. Treat dataset separability as the load-bearing blocker.
-5. If the project owner approves a new lane, test one pre-frozen full-frame foundation representation across the same three source LOSO folds before any new target access.
+5. **Historical next-step record:** this proposed full-frame foundation-representation lane was subsequently executed as HYGD-CEXT-2.0 and is now closed after the dataset-origin gate failed; it is not a current authorization.
 
 ## Model-Selection Adversarial Check
 
@@ -89,6 +89,34 @@ Official comparison sources:
 - https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md
 
 ## Evidence
+
+The aggregate statements above are bound to a private, read-only source set. Each
+record has exactly `{"role": <table path>, "sha256": <lowercase digest>,
+"size_bytes": <integer>}`. Records are sorted by the UTF-8 `role` value and
+serialized with Python `json.dumps(records, ensure_ascii=True,
+separators=(",", ":"), sort_keys=True)`. The manifest is SHA-256 over the ASCII
+domain separator `HYGD_MANUAL_GEOMETRY_PRIVATE_SOURCES_V1`, a newline, those
+canonical JSON bytes, and a final newline.
+
+**Private-source manifest SHA-256:** `8022b0ce2723b0f842bf8a68e40ab52d7dc9664015c794209cf585ec8a7d765b`
+
+| Private source role | SHA-256 | Bytes |
+|---|---|---:|
+| `validation/HYGD_BOUNDARY_ADJUDICATION_V1.md` | `03531587052c2026f3c90c2e4f8a3dd719547983f561d1e82a3a124aadb2b6fb` | 4,148 |
+| `data/hygd_boundary_annotations_v1.csv` | `22d191ddf3c0d5e94bf9bc4e4904741ede6a553d7f289e181a592ea0fcf66220` | 23,021 |
+| `results/hygd_boundary_adjudication_v1.json` | `1f53bb1963a723c4a9e99e22c95f71fc50e61a8b4cc5002acf5bc4ea1769413a` | 1,734 |
+| `results/hygd_boundary_adjudication_v1_details.csv` | `8115302126e36f4b3b3728e5286cc877165c8785c8a10ef13b41636ced524af0` | 17,862 |
+| `results/hygd_boundary_adjudication_v1_overlay.json` | `85be53f99bd12a809b361b6f3ac4da607f924d98d59c3df73f9d4fc14dd59c13` | 7,897 |
+| `results/hygd_boundary_adjudication_v1_overlay.png` | `63e76f3cc79fbef212b45c802158189235575f7ac7858f55f95bc337d53c53be` | 3,704,620 |
+| `results/hygd_scale_calibration_feasibility.json` | `944dbb0f156d34d63457cdf9bb4c70ef1afee5a655027a12fedb0a6ea35f43cb` | 1,966 |
+| `validation/make_hygd_boundary_adjudication_overlays.py` | `0c431b2c2fe8497ff05fa77a4f31ab7364f6bf346b5ae432c986d6158e326961` | 8,236 |
+| `validation/evaluate_hygd_scale_calibration_feasibility.py` | `ab1920c531431b675937b0e513274f0922de0307960a9e80b2fcc885145ab87d` | 5,927 |
+
+The hashes permit private workspace-level provenance checking without publishing
+row-level annotations, identifiers, images, overlays, or predictions. The lock
+chronology and mapping from these private, unpublished files to the public
+aggregates remain externally `needs-proof`; the files are not distributable
+evidence from this repository.
 
 - `validation/HYGD_BOUNDARY_ADJUDICATION_V1.md`
 - `data/hygd_boundary_annotations_v1.csv`

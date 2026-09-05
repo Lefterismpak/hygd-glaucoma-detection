@@ -1,4 +1,9 @@
 {
+  "_provenance": {
+    "status": "historical_single_split_development_artifact",
+    "canonical_internal_estimate": false,
+    "warning": "Exploratory image-row analysis from the selected historical development model; not confirmatory error evidence."
+  },
   "model": "results/finetune_layer4_aug.pt",
   "n_correct": 94,
   "n_wrong": 5,

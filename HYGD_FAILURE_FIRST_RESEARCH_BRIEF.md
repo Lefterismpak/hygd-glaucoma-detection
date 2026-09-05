@@ -1,6 +1,6 @@
 # HYGD Failure-First Glaucoma AI Audit
 
-**Status:** reviewer brief, 2026-07-14
+**Status:** reviewer brief; claim hierarchy updated 2026-09-04
 
 **Bottom line:** the project demonstrates strong discrimination inside one
 single-site fundus dataset, but it does not establish transportability to a new
@@ -45,9 +45,10 @@ performance. A later audit found three reasons to narrow that interpretation:
 
 The project then moved to locked source-only qualifications. A geometry-based
 candidate was stopped before glaucoma-classifier training when held-out optic
-disc scale transfer failed. A later manual audit showed that its center
-localization was accurate but its diameter target was synthetic; correcting the
-scale on the same sample still left dataset-origin accuracy at 0.9420. A frozen
+disc scale transfer failed. A later 36-image exploratory manual audit passed its
+predeclared center-error criterion but failed diameter and combined criteria;
+the original diameter target was synthetic. Same-sample scale correction did
+not pass the predeclared dataset-origin gate. A frozen
 DINOv2 representation improved cross-source disease AUROC, yet made dataset
 origin almost perfectly decodable. Fixed image-space preprocessing did not
 remove that signal.
@@ -57,8 +58,8 @@ remove that signal.
 | Stage | Result | Current interpretation |
 | --- | --- | --- |
 | Historical HYGD development | Test AUROC 0.976; CV AUROC 0.988 +/- 0.008 | Superseded as the preferred internal estimate |
-| Repaired HYGD evaluation | Duplicate-aware group AUROC **0.9904**, 95% CI **0.9797-0.9980**, 283 groups | Strong single-site discrimination; post-development resampling only |
-| Historical adaptive recovery | PAPILA **0.857 +/- 0.019**; RIM-ONE **0.915 +/- 0.012** | Development evidence, not untouched validation or current transportability proof |
+| Repaired HYGD evaluation | Mean outer-fold duplicate-aware group AUROC **0.9908**, conditional 95% CI **0.9790-0.9990**, 283 groups | Read-only v5 aggregate reanalysis of frozen private OOF predictions from a run asserted to date from 2026-07-11; no contemporaneous public timestamp, retraining, or end-to-end v5 model run |
+| Historical adaptive recovery | PAPILA **0.857 +/- 0.019**; RIM-ONE **0.915 +/- 0.012** | Five-run sample mean +/- SD, not CIs; target-adaptive development, noncanonical per-run intervals, subject/license boundaries `needs-proof` |
 | HYGD-CEXT-1.1 | Equal-source mean AUROC **0.6227**, 95% CI **0.5822-0.6632** | Failed source-only qualification; confirmatory target-access gate ("Lock B") blocked |
 | HYGD-CEXT-2.0 | Equal-source mean AUROC **0.7105**, 95% CI **0.6746-0.7423**; origin accuracy **0.9994** | Disease gate passed; decisive shortcut gate failed |
 | Shortcut S2 | Equal-source mean AUROC **0.7364**; origin accuracy **0.9933** | Fixed preprocessing did not repair source decoding |
@@ -70,10 +71,11 @@ disease discrimination could improve while source identity remained nearly
 perfectly encoded. AUROC alone was therefore insufficient for promotion.
 
 The adaptive-recovery row is retained only to document the development
-chronology. Compatibility of the mixed-dataset training recipe with the
-RIM-ONE DL use terms remains `needs-proof`; those values should not support a
-paper, competition, or external performance claim without written
-clarification.
+chronology. Its historical PAPILA intervals resampled eyes rather than patients,
+and RIM-ONE subject independence is not established by image stems. Compatibility
+of the mixed-dataset training recipe with the RIM-ONE DL use terms remains
+`needs-proof`; those values should not support a paper, competition, or external
+performance claim without written clarification.
 
 ## What The Evidence Supports
 
@@ -148,13 +150,14 @@ and a promotion gate that tests more than disease AUROC.
 
 ## Evidence Map
 
-This first public snapshot contains the reviewer brief and narrative audit
-reports only. Lower-level scripts, locks, predictions, and aggregate result
-files named inside those reports are provenance references from the full
-audited workspace; they are not included here and are not claimed to be
-publicly reproducible from this snapshot alone.
+The public repository now includes the evaluator, synthetic integrity tests,
+historical aggregate artifacts with explicit evidence labels, and a privacy-safe
+aggregate receipt. Private row-level predictions, checkpoints, data, and run
+bundles remain unpublished. Their SHA-256 commitments do not make the numerical
+result publicly reproducible or prove a contemporaneous 2026-07-11 timestamp.
 
 - [Internal evaluation repair](INTERNAL_EVALUATION_REPAIR.md)
+- [Aggregate-only internal evidence receipt](results/repaired_internal_evaluation_summary.json)
 - [Source-only qualification report](SOURCE_ONLY_QUALIFICATION_REPORT.md)
 - [Manual geometry result](HYGD_MANUAL_GEOMETRY_RESULT.md)
 - [HYGD-CEXT-2.0 protocol](HYGD_CEXT_2_0_PROTOCOL.md)

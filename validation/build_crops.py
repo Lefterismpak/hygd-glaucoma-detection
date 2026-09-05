@@ -1,10 +1,12 @@
-"""Disc-size-standardized crop + colour/illumination normalization for all 3 datasets,
-cached to data/processed/crops/. Ends with the DATASET-PROBE GATE — the single most
-important check: if a classifier can still tell which dataset a normalized crop came
-from, the field-of-view/colour shortcut survives and transfer training will fail.
+"""Historical adaptive crop/normalization candidate for three datasets.
+
+The dataset-origin probe is a diagnostic of residual source separability, not a
+causal shortcut test or a guarantee of downstream transfer. A high value weakens
+source-invariance claims; a low value would not prove shortcut removal.
 
 Crop: square of side k*disc_diameter centred on the disc (aspect-preserving) -> 224.
-Norm: Shades-of-Gray colour constancy + CLAHE(L) + circular mask (kills bezel corners).
+Norm: Shades-of-Gray colour constancy + CLAHE(L). A circular mask was tested and
+rejected because it introduced a new dataset signature.
 """
 
 import os
@@ -102,8 +104,11 @@ def build():
 
 
 def dataset_probe(mf):
-    """THE GATE: can a linear model predict dataset-of-origin from a normalized crop?
-    Uses small downsized pixels as features. Near-chance = shortcut removed."""
+    """Describe dataset separability from downsized normalized-crop pixels.
+
+    Near-chance accuracy is compatible with this probe lacking source signal; it
+    does not prove that shortcuts were removed or that transfer will succeed.
+    """
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import cross_val_score
     X, y = [], []

@@ -4,7 +4,7 @@
 
 **Protocol:** `HYGD-CEXT-2.0`
 
-**Scientific recipe:** unchanged from `HYGD_CEXT_2_0_PROTOCOL.md`
+**Scientific recipe:** bound to the private byte-identical locked protocol at SHA-256 `edea2a4c991c8b2e3c44ae23a3e26b601b82fa33ad889f7b8cd96b0865b4a721`; `HYGD_CEXT_2_0_PROTOCOL.md` is a later annotated public copy, not the lock artifact.
 
 This file resolves implementation details that the protocol intentionally described at a higher level. It was written before any source-image DINOv2 feature was extracted or any F0 classifier was fitted.
 
@@ -39,7 +39,7 @@ This file resolves implementation details that the protocol intentionally descri
 ## Dataset-Origin Probe
 
 - Labels are fixed as `HYGD=0`, `PAPILA=1`, `RIMONE=2`.
-- Four folds use `StratifiedGroupKFold(n_splits=4, shuffle=True, random_state=20260713)` with frozen subject clusters as groups.
+- Four folds use `StratifiedGroupKFold(n_splits=4, shuffle=True, random_state=20260713)` with frozen declared evaluation-group identifiers. These groups implement the source-specific contract above; they do not independently establish RIM-ONE biological-subject identity.
 - Each fold uses unweighted multinomial-capable logistic regression with `solver=lbfgs`, `C=1.0`, `penalty=l2`, `max_iter=5000`, `random_state=20260713`.
 - The gate metric is the unweighted mean of the four held-out fold accuracies. Pooled out-of-fold accuracy is reported as a secondary check.
 

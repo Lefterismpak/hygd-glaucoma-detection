@@ -1,4 +1,21 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Target AUROC was visible during the wider development chronology; this run is adaptive evidence only."
+  },
+  "_uncertainty_provenance": {
+    "status": "historical_image_row_bootstrap_noncanonical",
+    "resampling_unit": "image_row",
+    "cluster_unit": "verified_subject_id_unavailable",
+    "subject_independence": "needs-proof",
+    "patient_cluster_interval": false,
+    "n_bootstrap": 2000,
+    "seed": 42
+  },
   "attempt": "B_reverse_multitask_VCDR",
   "seed": 3,
   "held_out_dataset": "RIMONE",
@@ -8,7 +25,7 @@
     0.9288
   ],
   "vcdr_weight": 0.5,
-  "vcdr_supervised_on": "PAPILA only (expert contours); HYGD masked out",
+  "vcdr_supervised_on": "PAPILA only (dataset-provided two-grader contour-derived VCDR; historical auxiliary-label rule); HYGD masked out",
   "sources": [
     "HYGD",
     "PAPILA"

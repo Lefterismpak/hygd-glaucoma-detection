@@ -38,6 +38,10 @@ The lock was corrected additively, no dependency was installed or changed, and t
 
 ## Verification
 
+The verification artifacts described below are private and unpublished. Their
+mapping to these public aggregates remains externally `needs-proof`; the summary
+does not make row-level predictions, features, or audit bytes public evidence.
+
 - S1 primary/rerun feature files matched exactly at SHA-256 `ff537a3f71d456d36b7a14841db604d0ca2d30e2c344c5d0daad469225172537`.
 - S2 primary/rerun feature files matched exactly at SHA-256 `4c43337ce46539ffee47f0358dd0a7f6bf17028e927f270fd6a9f87ce9dc53b2`.
 - All S1/S2 disease, permutation, and origin prediction artifacts matched their reruns exactly.
