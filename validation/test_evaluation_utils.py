@@ -8,6 +8,7 @@ import tempfile
 import unittest
 import copy
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 from unittest.mock import patch
@@ -41,6 +42,8 @@ from validation.evaluation_utils import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TORCH_AVAILABLE = importlib.util.find_spec("torch") is not None
+TORCHVISION_AVAILABLE = importlib.util.find_spec("torchvision") is not None
 EXPECTED_INVENTORY_SHA256 = (
     "1187ea38d89ee414442113869d5c6d8c575530e935b8169c8c037b3f4c53a291"
 )
@@ -1699,6 +1702,7 @@ class EvaluationUtilsTests(unittest.TestCase):
                     "results/patient_aware",
                 )
 
+    @unittest.skipUnless(TORCH_AVAILABLE, "PyTorch is an optional heavyweight dependency")
     def test_safe_checkpoint_round_trip_is_hash_bound_and_fresh(self):
         import torch
 
@@ -1723,6 +1727,10 @@ class EvaluationUtilsTests(unittest.TestCase):
                     checkpoint, expected_sha256="0" * 64
                 )
 
+    @unittest.skipUnless(
+        TORCH_AVAILABLE and TORCHVISION_AVAILABLE,
+        "PyTorch and torchvision are optional heavyweight dependencies",
+    )
     def test_full_checkpoint_architecture_never_requests_pretrained_weights(self):
         import torch.nn as nn
 
