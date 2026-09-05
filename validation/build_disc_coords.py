@@ -1,6 +1,9 @@
-"""Build optic-disc centre+diameter for every image in HYGD / PAPILA / RIM-ONE,
-so the preprocessing can crop a disc-size-standardized square (the load-bearing
-step for cross-dataset transfer — see validation/FINDINGS DG plan).
+"""Historical adaptive optic-disc centre/diameter preparation for three datasets.
+
+This utility generated one disc-size-standardized preprocessing candidate. Its
+outputs do not establish localization accuracy, causal shortcut removal, or
+cross-dataset transportability; later locked source-only gates did not qualify
+the candidate.
 
 - PAPILA: rasterize the expert disc contours (avg of exp1/exp2) -> GT centre/diam.
 - RIM-ONE: read the shipped Disc-T PNG masks -> GT centre/diam.
@@ -47,7 +50,7 @@ def papila_coords():
     rows = []
     lbl = pd.read_csv(DATA / "papila_labels.csv")
     for _, r in lbl.iterrows():
-        stem = os.path.splitext(os.path.basename(r["image_path"]))[0]  # RET002OD
+        stem = os.path.splitext(os.path.basename(r["image_path"]))[0]  # image stem
         w, h = Image.open(r["image_path"]).size
         polys = []
         for exp in (1, 2):

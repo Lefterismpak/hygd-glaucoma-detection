@@ -22,15 +22,27 @@ from PIL import Image
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.experiments import build_model, build_transforms  # noqa: E402
+from validation.evaluation_utils import load_torch_state_dict_safely  # noqa: E402
 
 _EVAL_TF = build_transforms(train=False)
-DEFAULT_CKPT = "results/finetune_layer4_aug.pt"
+DEFAULT_CKPT = Path(__file__).resolve().parents[1] / "results/finetune_layer4_aug.pt"
 
 
-def load_model(checkpoint=DEFAULT_CKPT, device="cpu"):
-    """Load the HYGD best model (fine-tuned layer4) from a checkpoint."""
-    model = build_model(mode="finetune_layer4")
-    model.load_state_dict(torch.load(checkpoint, map_location=device))
+def load_model(
+    checkpoint=DEFAULT_CKPT,
+    device="cpu",
+    *,
+    expected_checkpoint_sha256=None,
+):
+    """Load a local weights-only state dict without following filesystem links."""
+    model = build_model(mode="finetune_layer4", pretrained=False)
+    state, digest = load_torch_state_dict_safely(
+        checkpoint,
+        map_location=device,
+        expected_sha256=expected_checkpoint_sha256,
+    )
+    model.load_state_dict(state)
+    model.checkpoint_sha256 = digest
     model.eval().to(device)
     return model
 
@@ -60,7 +72,11 @@ if __name__ == "__main__":
 
     ap = argparse.ArgumentParser(description="P(glaucoma) for one fundus image")
     ap.add_argument("image")
-    ap.add_argument("--checkpoint", default=DEFAULT_CKPT)
+    ap.add_argument("--checkpoint", required=True)
+    ap.add_argument("--checkpoint-sha256", required=True)
     args = ap.parse_args()
-    m = load_model(args.checkpoint)
+    m = load_model(
+        args.checkpoint,
+        expected_checkpoint_sha256=args.checkpoint_sha256,
+    )
     print(f"{args.image}\tP(glaucoma)={predict_prob(args.image, m):.6f}")

@@ -27,7 +27,7 @@
         0.9722222222222222
       ]
     },
-    "screening_threshold_sens>=0.95": {
+    "historical_test_derived_threshold_sens>=0.95_nondeployment": {
       "threshold": 0.47456833720207214,
       "sensitivity": 0.9538461538461539,
       "specificity": 0.8529411764705882
@@ -88,7 +88,7 @@
         1.0
       ]
     },
-    "screening_threshold_sens>=0.95": {
+    "historical_test_derived_threshold_sens>=0.95_nondeployment": {
       "threshold": 0.6399614214897156,
       "sensitivity": 0.9538461538461539,
       "specificity": 0.9411764705882353
@@ -126,5 +126,14 @@
     "test_sensitivity": 0.8923076923076924,
     "test_specificity": 0.9705882352941176,
     "note": "Phase-4 baseline, no augmentation, from results/metrics.json"
+  },
+  "_provenance": {
+    "status": "historical_development_comparison",
+    "canonical_internal_estimate": false,
+    "configuration_selection_permitted": false,
+    "evaluation_unit": "image_row_with_repeated_images_per_patient",
+    "bootstrap_unit": "image_row_noncanonical",
+    "deployment_recommendation": false,
+    "warning": "All configurations and threshold candidates were evaluated on the same development test split; the image-row intervals are noncanonical. Use the duplicate-aware inner/outer evaluator instead."
   }
 }

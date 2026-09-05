@@ -1,0 +1,309 @@
+{
+  "schema_version": "hygd-public-internal-summary-v1",
+  "protocol_version": "2026-09-04-v5",
+  "evidence_status": {
+    "status": "preferred_internal_post_development_resampling",
+    "preferred_internal_estimate": true,
+    "canonical_v5_end_to_end_run": false,
+    "model_retrained_for_reanalysis": false,
+    "confirmatory_evidence": false,
+    "single_site_single_camera": true,
+    "transportability_established": false,
+    "calibration_established": false,
+    "clinical_utility_established": false,
+    "deployment_ready": false,
+    "public_reproducibility": "aggregate_receipt_only"
+  },
+  "dataset_identity": {
+    "schema_version": "hygd-dataset-identity-v1",
+    "dataset_id": "physionet-hygd",
+    "dataset_name": "Hillel Yaffe Glaucoma Dataset",
+    "dataset_version": "1.1.0",
+    "doi": "10.13026/m92s-0z95",
+    "labels_csv_sha256": "c2f4e6e756f6f5f9d9d900f613cf329116da9897877e480cc9782bc042d4c0f5",
+    "row_manifest_algorithm": "hygd-row-manifest-v1",
+    "ordered_image_sha256_patient_id_label_inventory_sha256": "1187ea38d89ee414442113869d5c6d8c575530e935b8169c8c037b3f4c53a291",
+    "contract_sha256": "99f432f036087f3875ca16ff1910175505a57c569cf92c17fb9345473b519040",
+    "counts": {
+      "source_rows": 747,
+      "unique_image_hashes": 737,
+      "supplied_patient_ids": 288,
+      "source_negative_rows": 199,
+      "source_positive_rows": 548,
+      "removed_exact_duplicate_rows": 10,
+      "duplicate_hash_groups": 10,
+      "cross_patient_duplicate_hash_groups": 6,
+      "independent_evaluation_groups": 283
+    }
+  },
+  "execution_origin": {
+    "model_run_date_assertion": "2026-07-11",
+    "model_run_protocol_version": "2026-07-11-v1",
+    "legacy_run_start_audit_terminal_status": "running",
+    "completion_basis": "Private complete-result JSON, semantic threshold/history checks, and independent OOF integrity recomputation",
+    "public_time_attestation": "not_available",
+    "model_retrained_for_publication": false,
+    "aggregate_reanalysis_date": "2026-09-04",
+    "aggregate_reanalysis_protocol_version": "2026-09-04-v5",
+    "aggregate_reanalysis_implementation_sha256": "299278e2699d01c5e5b5209f1c96768f59daaaf980cb919315cfb0f8ec12a9bf",
+    "aggregate_reanalysis_script_sha256": "b2761df142bb8744da2fec4928bdc0ccfd7dd397d8c36bed3b22916f8726cf33",
+    "aggregate_reanalysis_argv": [
+      "python",
+      "-B",
+      "validation/reanalyze_frozen_oof.py",
+      "--expected-source-manifest-sha256",
+      "1163d6ab73cbc3417be69289f81413399970735218508c822f9163c9a1a5d283",
+      "--expected-dataset-contract-sha256",
+      "99f432f036087f3875ca16ff1910175505a57c569cf92c17fb9345473b519040",
+      "--expected-oof-identity-sha256",
+      "fbbaa74909dbc242843b708ca6073214e043e3e45a26856c827ce744024f849e",
+      "--expected-group-fold-assignment-sha256",
+      "c9d142c3fcfb213a6c1815468576694aec94db076e9f929c0d7018b0b2333432",
+      "--outer-folds",
+      "5",
+      "--seed",
+      "20260711",
+      "--bootstrap",
+      "5000",
+      "--emit",
+      "aggregate-only"
+    ],
+    "aggregate_reanalysis_runtime": {
+      "python": "3.14.6",
+      "numpy": "2.5.1",
+      "pandas": "3.0.3",
+      "scikit_learn": "1.9.0"
+    },
+    "aggregate_reanalysis_status": "verified_private_read_only",
+    "model_training_or_inference_executed_for_reanalysis": false,
+    "current_v5_code_used_for_training": false,
+    "private_source_only": true,
+    "scope": "Aggregate-only reanalysis of frozen legacy out-of-fold predictions; not an end-to-end v5 model rerun."
+  },
+  "primary": {
+    "n": 283,
+    "positives": 183,
+    "negatives": 100,
+    "sensitivity": 0.9562841530054644,
+    "specificity": 0.97,
+    "confusion_tn_fp_fn_tp": [
+      97,
+      3,
+      8,
+      175
+    ],
+    "grain": "evaluation_group",
+    "auroc": 0.9908108108108108,
+    "auroc_95ci": [
+      0.9789536079973695,
+      0.9990035478446332
+    ],
+    "sensitivity_95ci": [
+      0.9252835146597824,
+      0.9833333333333333
+    ],
+    "specificity_95ci": [
+      0.9320333186231244,
+      1.0
+    ],
+    "discrimination_estimand": "unweighted_mean_outer_fold_auroc",
+    "classification_estimand": "pooled_oof_binary_decisions_using_fold_specific_thresholds_recorded_as_inner_validation_selected_in_legacy_result",
+    "uncertainty_source": "fold_stratified_evaluation_group_bootstrap",
+    "fold_aurocs": [
+      {
+        "outer_fold": 0,
+        "n_groups": 57,
+        "positives": 37,
+        "negatives": 20,
+        "auroc": 0.9756756756756757
+      },
+      {
+        "outer_fold": 1,
+        "n_groups": 57,
+        "positives": 37,
+        "negatives": 20,
+        "auroc": 0.9932432432432432
+      },
+      {
+        "outer_fold": 2,
+        "n_groups": 57,
+        "positives": 37,
+        "negatives": 20,
+        "auroc": 0.9851351351351351
+      },
+      {
+        "outer_fold": 3,
+        "n_groups": 56,
+        "positives": 36,
+        "negatives": 20,
+        "auroc": 1.0
+      },
+      {
+        "outer_fold": 4,
+        "n_groups": 56,
+        "positives": 36,
+        "negatives": 20,
+        "auroc": 1.0
+      }
+    ],
+    "group_count_weighted_mean_auroc": 0.9907458695444562,
+    "bootstrap": {
+      "resampling_unit": "evaluation_group_within_outer_fold",
+      "fold_weighting": "equal",
+      "seed": 20269714,
+      "n_bootstrap": 5000,
+      "valid_replicates": 5000
+    }
+  },
+  "secondary_descriptive": {
+    "pooled_oof_group": {
+      "n": 283,
+      "positives": 183,
+      "negatives": 100,
+      "auroc": 0.9904371584699454,
+      "sensitivity": 0.9562841530054644,
+      "specificity": 0.97,
+      "confusion_tn_fp_fn_tp": [
+        97,
+        3,
+        8,
+        175
+      ],
+      "auroc_95ci": [
+        0.9796984022678148,
+        0.9979964946435462
+      ],
+      "sensitivity_95ci": [
+        0.9244162476429918,
+        0.9834254143646409
+      ],
+      "specificity_95ci": [
+        0.9320333186231244,
+        1.0
+      ],
+      "grain": "evaluation_group",
+      "status": "secondary_descriptive_continuity_metric",
+      "uncertainty_source": "global_group_cluster_bootstrap_over_pooled_oof_scores"
+    },
+    "image_level": {
+      "n": 737,
+      "positives": 540,
+      "negatives": 197,
+      "auroc": 0.9837187441248355,
+      "sensitivity": 0.95,
+      "specificity": 0.9289340101522843,
+      "confusion_tn_fp_fn_tp": [
+        183,
+        14,
+        27,
+        513
+      ],
+      "auroc_95ci": [
+        0.9730799442825346,
+        0.9925054558246927
+      ],
+      "sensitivity_95ci": [
+        0.9270060298317994,
+        0.9720404065628732
+      ],
+      "specificity_95ci": [
+        0.8831725989262279,
+        0.9704433497536946
+      ],
+      "grain": "unique_image_hash",
+      "uncertainty_source": "evaluation_group_cluster_bootstrap",
+      "status": "secondary_descriptive"
+    }
+  },
+  "private_source_binding": {
+    "schema_version": "hygd-private-source-binding-v1",
+    "manifest_algorithm": "sha256(HYGD_PRIVATE_SOURCE_MANIFEST_V1 newline + canonical JSON source-file records + newline)",
+    "source_manifest_sha256": "1163d6ab73cbc3417be69289f81413399970735218508c822f9163c9a1a5d283",
+    "oof_identity_algorithm": "hygd-deduplicated-oof-identity-v1",
+    "oof_identity_fields": [
+      "image_name",
+      "patient_id",
+      "evaluation_group",
+      "sha256",
+      "label"
+    ],
+    "oof_identity_rows": 737,
+    "deduplicated_oof_identity_sha256": "fbbaa74909dbc242843b708ca6073214e043e3e45a26856c827ce744024f849e",
+    "canonical_group_fold_assignment_algorithm": "hygd-canonical-group-fold-v1",
+    "canonical_group_fold_assignment_fields": [
+      "evaluation_group",
+      "label",
+      "n_images",
+      "outer_fold"
+    ],
+    "canonical_group_fold_assignment_sha256": "c9d142c3fcfb213a6c1815468576694aec94db076e9f929c0d7018b0b2333432",
+    "outer_fold_assignment_groups": 283,
+    "outer_fold_assignment_contract": {
+      "splitter": "sklearn.model_selection.StratifiedKFold",
+      "scikit_learn_version": "1.9.0",
+      "n_splits": 5,
+      "shuffle": true,
+      "seed": 20260711,
+      "stable_group_order": "evaluation_group ascending"
+    },
+    "observed_private_mapping_match": true,
+    "legacy_semantic_checks": {
+      "legacy_result_protocol_version": "2026-07-11-v1",
+      "legacy_result_status": "complete",
+      "legacy_run_start_audit_status": "running",
+      "thresholds_match_oof_by_outer_fold": true,
+      "best_epochs_match_recorded_inner_loss_argmin": true,
+      "outer_fold_metrics_match_frozen_oof": true,
+      "legacy_result_claimed_outer_test_visibility": "none",
+      "separate_legacy_runner_source_review": "fold_outcomes_were_displayed_before_later_folds_completed",
+      "absence_of_midrun_adaptation": "needs-proof",
+      "legacy_training_code_in_source_manifest": false,
+      "legacy_checkpoint_bytes_in_source_manifest": false,
+      "threshold_selection_provenance": "recorded_as_inner_group_validation_in_legacy_result_not_independently_rerun"
+    },
+    "source_files": [
+      {
+        "role": "audit",
+        "sha256": "e4f7f7ccf969241ada327397950a1ea8709bf3916e1abf43c7362338a2760523",
+        "size_bytes": 4343
+      },
+      {
+        "role": "group_folds",
+        "sha256": "740ecaf2f8fcf1755ceb51e96d30ea1a96545a389c49026223491e0f68d7584e",
+        "size_bytes": 3070
+      },
+      {
+        "role": "legacy_result_json",
+        "sha256": "a78a8fe4b3182ed89053c1859328b635ff5f7b3536f59e1146466534e11b9beb",
+        "size_bytes": 19278
+      },
+      {
+        "role": "oof_groups",
+        "sha256": "d173d13ad871727fdd9e8691383ed476638e337e9a6c7bd00e741c786dc86029",
+        "size_bytes": 14576
+      },
+      {
+        "role": "oof_images",
+        "sha256": "f67f3bc77573dac6ce535d7f9b795e5d66061614a920951b49173c79a1191a89",
+        "size_bytes": 97490
+      }
+    ],
+    "row_level_artifacts_published": false
+  },
+  "privacy": {
+    "patient_or_image_identifiers": false,
+    "row_level_predictions": false,
+    "raw_images": false,
+    "model_weights": false,
+    "absolute_paths": false
+  },
+  "limitations": [
+    "The model recipe was informed by earlier HYGD development, so this is post-development internal resampling rather than prospectively untouched validation.",
+    "The legacy runner displayed each completed outer-fold outcome before later folds finished. No mid-run adaptation is documented, but its absence is needs-proof; the reported models were not trained by the outcome-blind v5 runner.",
+    "Fold-specific thresholds and best epochs are post-hoc consistency-checked against the legacy result record and frozen OOF rows, but their inner-validation selection was not independently rerun.",
+    "The legacy threshold tie-breaker differed from the current v5 helper, and the private bundle contains neither the inner-validation predictions nor checkpoint bytes needed to reproduce selection or model execution.",
+    "The interval conditions on the frozen OOF predictions and recorded fold/decision choices; it excludes retraining, checkpoint and threshold selection, mid-run adaptation, and recipe-selection uncertainty.",
+    "The data come from one hospital and one camera. Transportability, calibration, clinical utility, and deployment readiness remain unestablished.",
+    "The private source hashes bind this aggregate to the audited workspace but cannot be reverified from the public repository without the private row-level artifacts."
+  ]
+}

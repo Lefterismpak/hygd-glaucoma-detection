@@ -1,22 +1,27 @@
-# GlaucoGen — External Validation Protocol (pre-registered)
+# GlaucoGen — Historical External Validation Protocol (pre-registered)
 
 > **Written 2026-07-05, BEFORE any external-dataset probability was computed.** The point of pre-registering is credibility: every analysis decision below is fixed *before* seeing the numbers, so the eventual "domain-shift drop" cannot be a story fitted after the fact. Deviations, if any, will be logged in a dated "Deviations" section at the bottom — never silently.
 
-## Objective
+> **Retrospective status correction (2026-08-31):** This file preserves the original historical protocol; it is not the current claim hierarchy. Its `0.988 +/- 0.008` HYGD CV baseline is superseded and non-canonical, and later target visibility/resources made the recovery work adaptive rather than prospectively untouched. Historical external intervals used eye/image-row bootstrap rather than patient-cluster bootstrap; the calibration split was grouped but not outcome-stratified; RIM-ONE subject independence is `needs-proof`. PAPILA Figshare v2 reports GPL 3.0+; the earlier permissive-license attribution was wrong. RIM-ONE permits research/education use, prohibits copying/redistribution, and instructs users not to add other databases for training or tuning; compatibility of the mixed-source experiments therefore remains `needs-proof`. Use [`../INTERNAL_EVALUATION_REPAIR.md`](../INTERNAL_EVALUATION_REPAIR.md), [`../results/repaired_internal_evaluation_summary.json`](../results/repaired_internal_evaluation_summary.json), and [`../HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md`](../HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md) for the adjudicated evidence.
 
-Measure, honestly, how the published HYGD glaucoma model (`finetune_layer4_aug`, patient-level CV AUROC 0.988 ± 0.008 in-distribution) generalizes to **independent** public fundus datasets, and how much of any drop is recoverable by recalibration/threshold-tuning vs is a true loss of discrimination.
+## Historical objective
 
-## Datasets (external, held-out — never used in HYGD training)
+Measure, honestly, how the published HYGD glaucoma model (using the **historical, superseded** patient-level CV AUROC 0.988 +/- 0.008 as the then-current in-distribution baseline) performs on independent public fundus datasets, and how much of any drop appears recoverable by recalibration/threshold-tuning versus loss of discrimination.
+
+## Historical external datasets
 
 | Dataset | License | Use | Redistribution |
 |---|---|---|---|
-| **PAPILA** | CC BY 4.0 | primary external test | label CSV + derived figures committable |
-| **RIM-ONE DL** | research/education, no redistribution | secondary external test | ship a regeneration script only; data git-ignored |
+| **PAPILA** | Figshare v2: GPL 3.0+ | historical primary external test | images/crops not redistributed; derived redistribution compatibility `needs-proof` |
+| **RIM-ONE DL** | research/education only; copying/redistribution prohibited | historical secondary external test | data git-ignored; mixed-source training/tuning compatibility `needs-proof` |
 
 - ORIGA is **excluded** (no clean public license). REFUGE, if ever added, results/figures only — never redistributed images.
 - Glaucoma-"suspect" images: **primary analysis excludes suspects** (binary glaucoma vs healthy). A secondary sensitivity analysis may include suspects-as-positive, reported separately and labelled as such.
 
-## Fixed pre-registered decisions
+## Fixed decisions as written in 2026-07-05
+
+The numbered items below are retained verbatim as the intended protocol. The
+dated deviations section records where execution did not satisfy them.
 
 1. **Model is frozen.** The exact committed checkpoint is used as-is for the zero-shot analysis. No retraining before the zero-shot numbers are reported.
 2. **Inference preprocessing is `validation/predict.py`** — proven to match the HYGD eval pipeline to < 1e-4 by `validation/verify_parity.py` (PASS, max Δ = 2.8e-06 on 2026-07-05). Any external inference uses this path only.
@@ -34,13 +39,13 @@ Measure, honestly, how the published HYGD glaucoma model (`finetune_layer4_aug`,
 - (c) Never fine-tune and evaluate on the same dataset.
 - (d) State that AUROC is unchanged by monotone recalibration; do not present recalibration as a discrimination gain.
 
-## Deliverables
+## Historical deliverables and current status
 
-- `validation/predict.py` (done), `validation/verify_parity.py` (done, PASS).
-- `validation/eval_external.py` — zero-shot + calibration + threshold, one function per dataset (post-freeze).
-- `VALIDATION.md` external-validation section: one summary TABLE + reliability/ROC FIGURES.
-- `TRIPOD-AI-checklist.md` filled for the external-validation study.
-- README "External Validation on 2 independent datasets" section — the concrete PI-outreach artifact.
+- `validation/predict.py` and `validation/verify_parity.py`: present; historical parity claim retained as provenance.
+- `validation/eval_external.py`: present; historical outputs only partially satisfied the patient-level, stratification, and provenance contract. The current code writes to a private patient-aware namespace. It emits no canonical subject-cluster interval: an operator-supplied mapping must be hash-bound, and its biological correctness remains `needs-proof` unless independently sourced and verified.
+- `VALIDATION.md`: present, now adjudicated as an adaptive chronology.
+- `TRIPOD-AI-checklist.md`: not present in this public repository.
+- README external evidence section: replaced by a failure-first claim hierarchy; no PI-outreach external-validation claim is made.
 
 ## Prior art to cite (not re-derive)
 
@@ -50,12 +55,17 @@ Measure, honestly, how the published HYGD glaucoma model (`finetune_layer4_aug`,
 - RETFound-vs-CNN glaucoma external comparison (Ophthalmology Science 2025) — situate results against it.
 - The patient-vs-image data-leakage failure mode (cite an established reference) — motivates the patient-level insistence.
 
-## needs-proof before running (verify at execution time)
-- PAPILA download URL (Figshare mirror) and its image-file license line (reported as unusually GPL-3.0+ for the images — confirm before any redistribution of derived crops).
-- RIM-ONE DL download (github.com/miag-ull/rim-one-dl; bit.ly redirect — confirm it resolves) and its exact split/augmentation terms.
+## needs-proof before any new run
+- PAPILA access is documented on Figshare v2 as GPL 3.0+; legal compatibility for redistribution of derived crops remains `needs-proof`.
+- RIM-ONE DL access terms permit research/education use, prohibit copy/redistribution, and request original partitions without adding other databases for training/tuning. Written clarification is required before any new mixed-source run.
+- A verified RIM-ONE subject mapping is required; image stems are not accepted as proof of subject independence.
 - External glaucoma base rates (used only to frame the calibration hypothesis, not as an input).
 
 ---
 
 ### Deviations from protocol
-*(none yet — append dated entries here if any decision above changes, with the reason.)*
+
+- **2026-07-14:** Target AUROC was visible during iterative development, and target-domain anatomical resources affected preprocessing. The recovery chronology is therefore adaptive development evidence, not untouched external validation.
+- **2026-08-30:** The original HYGD five-fold baseline was reclassified as historical and superseded after identifying test-set configuration selection, same-fold checkpoint/scoring reuse, and exact duplicates spanning supplied patient IDs. The duplicate-aware inner/outer evaluator is the preferred internal path.
+- **2026-08-31:** Historical PAPILA/RIM-ONE intervals were adjudicated as eye/image-row bootstrap rather than patient-cluster intervals. Historical external calibration used a grouped, non-stratified split; fine-tuning used a row split; RIM-ONE subject independence was not verified. The affected outputs remain numeric history with the literal `partial_with_deviations` or `needs-proof` labels, not canonical external evidence.
+- **2026-08-31:** PAPILA's public record was corrected from the earlier permissive-license attribution to Figshare v2 GPL 3.0+. RIM-ONE's official research/education, non-redistribution, and no-database-mixing instructions were added. Mixed-source compatibility remains `needs-proof`; no data or derived images are published here.

@@ -1,10 +1,18 @@
 {
+  "_provenance": {
+    "status": "historical_test_derived_threshold",
+    "canonical_internal_estimate": false,
+    "deployment_recommendation": false,
+    "evaluation_unit": "image_row_with_repeated_images_per_patient",
+    "patient_cluster_uncertainty": false,
+    "warning": "The candidate threshold was chosen on the historical development test split. It is not a calibrated clinical or deployment operating point."
+  },
   "model": "finetune_layer4_aug",
   "n_test": 99,
   "n_pos": 65,
   "n_neg": 34,
-  "recommended_threshold": 0.4,
-  "recommended_rationale": "screening: catches 63/65 disease (2 missed) for 3 false alarms; lower thresholds add false alarms without gaining sensitivity",
+  "historical_candidate_threshold": 0.4,
+  "historical_candidate_rationale": "on the development test split, catches 63/65 disease (2 missed) for 3 false alarms; this is not a deployment recommendation",
   "sweep": [
     {
       "threshold": 0.3,

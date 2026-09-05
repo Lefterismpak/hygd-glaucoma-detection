@@ -1,6 +1,15 @@
 # HYGD-CEXT-2.0 Source-Only Frozen-Feature Protocol
 
-**Status:** pre-download frozen on 2026-07-13
+> **Provenance correction (2026-09-02):** this is an annotated public copy, not
+> the byte-identical pre-download lock. The private frozen protocol was verified
+> locally at SHA-256 `edea2a4c991c8b2e3c44ae23a3e26b601b82fa33ad889f7b8cd96b0865b4a721`;
+> later wording corrections in this public file do not alter that historical
+> lock. Because the lock receipt and locked bytes are not published here, an
+> outside reader must treat the byte mapping as `needs-proof`.
+
+**Historical lock status:** pre-download frozen on 2026-07-13
+
+**Public-file status:** annotated after execution; not the lock artifact
 
 **Protocol ID:** `HYGD-CEXT-2.0`
 
@@ -8,7 +17,7 @@
 
 **Target access:** prohibited
 
-**Model/repository/weight download:** awaiting explicit project-owner approval
+**Model/repository/weight download at historical lock:** awaiting explicit project-owner approval; later approved and receipted as recorded in `HYGD_CEXT_2_0_RESULT.md`
 
 ## Question
 
@@ -17,7 +26,7 @@ Can one fixed, full-frame DINOv2-S/14 representation reduce source-domain shortc
 ## Fixed Prior Evidence
 
 - `HYGD-CEXT-1.1` remains closed and unchanged. Candidate A equal-source mean AUROC was 0.6227 [0.5822, 0.6632]; HYGD and PAPILA were near chance. Candidate B was geometry-ineligible and no classifier was trained.
-- `HYGD-MANUAL-GEOM-1` showed strong center localization but failed diameter and combined gates. The original manual-source masks used a synthetic 0.25-image-side diameter.
+- `HYGD-MANUAL-GEOM-1` passed its bounded 36-image center-error criterion but failed diameter and combined gates. This does not establish general localization accuracy. The original manual-source masks used a synthetic 0.25-image-side diameter.
 - Post-hoc scalar correction repaired resubstitution geometry but left dataset-origin accuracy at 0.9420 versus majority/chance 0.4541. It is not a candidate in this protocol.
 
 Frozen local inputs:
@@ -37,7 +46,11 @@ Frozen local inputs:
 - Official entrypoint: `dinov2_vits14`.
 - Architecture stated by the official model card: ViT-S/14, 21M parameters, 384-dimensional embedding.
 - Repository license checked on 2026-07-13: Apache License 2.0.
-- Weight-specific URL, resolved repository commit, byte size, and SHA-256 remain `needs-proof` until an explicitly approved first download creates a local receipt.
+- At the historical lock, the weight-specific URL, resolved repository commit,
+  byte size, and SHA-256 were `needs-proof` pending an explicitly approved first
+  download. That later private receipt is summarized in
+  `HYGD_CEXT_2_0_RESULT.md`; its unpublished byte mapping remains externally
+  `needs-proof`.
 - DINOv2 was not trained or validated for glaucoma diagnosis. This protocol tests representation transportability only.
 
 Official sources:
@@ -53,6 +66,7 @@ Official sources:
 - HYGD is evaluated on linked duplicate-aware groups.
 - PAPILA is evaluated at eye level with patient-cluster bootstrap.
 - RIM-ONE remains image-level with true subject independence labelled `needs-proof`.
+- RIM-ONE mixed-source use compatibility remains `needs-proof`; no external or publication performance claim is permitted from this protocol's mixed-source evidence.
 - No new source, target, image exclusion, manual correction, pseudo-label, or target-derived statistic is allowed.
 
 ## Fixed Preprocessing
@@ -111,7 +125,11 @@ F0 passes only if all conditions hold:
 
 There is no fallback candidate. A failed condition closes v2.0 without fine-tuning, another foundation model, target access, or post-result recipe change.
 
-## Authorization Boundary
+## Historical Authorization Boundary
+
+The clauses below are the pre-execution boundary preserved from the private
+lock. Approval and bounded execution occurred later; they are not the current
+status of this annotated file.
 
 Before explicit project-owner approval:
 

@@ -1,4 +1,9 @@
 {
+  "_provenance": {
+    "status": "historical_single_split_development_artifact",
+    "canonical_internal_estimate": false,
+    "warning": "Historical development-test metrics only; superseded by the duplicate-aware inner/outer aggregate receipt."
+  },
   "auc": 0.9524886877828054,
   "sensitivity": 0.8923076923076924,
   "specificity": 0.9705882352941176,
@@ -13,5 +18,7 @@
     ]
   ],
   "n_test_images": 99,
-  "n_test_patients": 44
+  "n_test_supplied_patient_ids": 44,
+  "n_test_patients": 44,
+  "n_test_patients_legacy_key_definition": "supplied_patient_id_count_not_independently_verified_biological_subjects"
 }

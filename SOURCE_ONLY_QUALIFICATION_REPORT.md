@@ -31,12 +31,14 @@ The addendum was frozen before qualification because PAPILA has seven patients w
 
 | Source | Supplied rows | Unique hashes | Evaluation units / clusters | Locked evaluation level |
 |---|---:|---:|---:|---|
-| HYGD | 747 | 737 | 283 / 283 | linked subject-group |
+| HYGD | 747 | 737 | 283 / 283 | linked evaluation group (supplied IDs + exact-hash links) |
 | PAPILA | 420 | 420 | 420 eyes / 210 patients | eye AUROC; patient-cluster bootstrap |
 | RIM-ONE DL | 485 | 485 | 485 / 485 | image AUROC; true subject independence `needs-proof` |
 | **Total** | **1,652** | **1,642** | **978 clusters** | source-specific |
 
-The audit found 10 exact-duplicate groups, all inside HYGD, and zero cross-dataset duplicate groups. Fold manifests have zero image-hash or subject-cluster overlap between training and held-out evaluation data. Source of truth: `results/confirmatory/source_audit.json`.
+The audit found 10 exact-duplicate groups, all inside HYGD, and zero cross-dataset duplicate groups. Fold manifests have zero image-hash or declared evaluation-group overlap between training and held-out evaluation data. This does not establish biological-subject independence for RIM-ONE, which remains `needs-proof`. The cited `results/confirmatory/source_audit.json` is a private, unpublished workspace source of truth; its mapping to these public aggregates remains externally `needs-proof`.
+
+RIM-ONE mixed-source use compatibility remains `needs-proof`; no external or publication performance claim is permitted from this mixed-source evidence.
 
 ## Candidate B: Geometry Qualification
 
@@ -48,7 +50,7 @@ Candidate B used the v1.1 U-Net localizer and could proceed to classifier traini
 | PAPILA | 0.9567 | center pass 0.9524, but median diameter ratio 4.4685 and combined pass 0.0000 | fail |
 | RIM-ONE | 0.9557 | center pass 1.0000, but median diameter ratio 0.5061 and combined pass 0.5093 | fail |
 
-High in-source segmentation Dice did not guarantee held-out scale transfer. Candidate B is therefore ineligible and `classifier_training_allowed` is false. Source of truth: `results/confirmatory/candidate_B/geometry_summary.json` and the three fold-level `geometry_qc.json` files.
+High in-source segmentation Dice did not guarantee held-out scale transfer. Candidate B is therefore ineligible and `classifier_training_allowed` is false. The cited geometry summary and fold-level `geometry_qc.json` files are private and unpublished; their mapping to the public aggregates remains externally `needs-proof`.
 
 ## Candidate A: Full-Frame Qualification
 
@@ -56,7 +58,7 @@ Candidate A completed the locked 15-run grid: three held-out sources, five seeds
 
 | Held-out source | AUROC | 95% cluster-bootstrap CI | Evaluation level |
 |---|---:|---:|---|
-| HYGD | 0.5220 | 0.4537-0.5901 | linked subject-group |
+| HYGD | 0.5220 | 0.4537-0.5901 | linked evaluation group (supplied IDs + exact-hash links) |
 | PAPILA | 0.5651 | 0.4727-0.6588 | eye, clustered by patient |
 | RIM-ONE | 0.7811 | 0.7347-0.8242 | image; subject independence `needs-proof` |
 | **Mean across sources** | **0.6227** | **0.5822-0.6632** | equal source mean |
@@ -70,13 +72,13 @@ Candidate A is selected **only by the predeclared fallback rule** after Candidat
 The independent audit passed:
 
 - 15 of 15 checkpoints load and match their recorded SHA-256 values.
-- All prediction rows, labels, image hashes, and source clusters match the locked fold manifests.
-- No training/evaluation hash or cluster leakage was found.
+- All prediction rows, labels, image hashes, and declared evaluation groups match the locked fold manifests.
+- No training/evaluation image-hash or declared evaluation-group leakage was found; RIM-ONE biological-subject independence remains `needs-proof`.
 - AUROCs, confidence intervals, equal-source mean, and threshold were independently recomputed to numerical equality.
 - Candidate B classifier artifact count is zero.
 - Recorded production runtime is 47,481.478 seconds (about 13.19 hours).
 
-Audit source: `results/confirmatory/independent_audit.json`.
+The cited `results/confirmatory/independent_audit.json` is private and unpublished; its mapping to this public verification summary remains externally `needs-proof`.
 
 ## Failure Analysis
 
@@ -90,11 +92,18 @@ Therefore the defensible project claim is now:
 
 ## Out-of-Protocol Artifact Boundary
 
-`results/source_only_localizer_forward_manual_source_prep.json` belongs to a later exploratory manual-source recipe change. Its initial HYGD center-QC failure compared against historical HYGD coordinates produced by an older non-HYGD U-Net, not anatomical ground truth, so that center verdict was rejected. Manual clicks support centering on the small adjudicated subset, but true disc diameter remains `needs-proof`, 19/747 HYGD predictions are missing, and dataset-probe accuracy remains 0.9563 versus 0.4541 majority/chance. No classifier was run.
+> **Chronology correction:** the paragraph below records the pre-adjudication state and is superseded for the narrow manual-geometry question by the later frozen aggregate result. It does not independently establish anatomical accuracy.
 
-`validation/HYGD_BOUNDARY_ADJUDICATION_V1.md` now freezes a separate blinded 36-image, subject-disjoint manual center-and-boundary gate (`HYGD-MANUAL-GEOM-1`). It is post-lock exploratory source geometry only, leaves `classifier_authorized=false`, and cannot modify or rescue HYGD-CEXT-1.1.
+`results/source_only_localizer_forward_manual_source_prep.json` belongs to a later exploratory manual-source recipe change. Its initial HYGD center-QC failure compared against historical HYGD coordinates produced by an older non-HYGD U-Net, not anatomical ground truth, so that center verdict was rejected. Manual clicks supported a separate bounded adjudication; no classifier was run from this artifact.
+
+`validation/HYGD_BOUNDARY_ADJUDICATION_V1.md` now freezes a separate blinded 36-image, linked-evaluation-group-disjoint manual center-and-boundary gate (`HYGD-MANUAL-GEOM-1`). Here, disjointness is defined by supplied HYGD IDs plus exact-hash links; it is not independent proof of biological-subject identity. The gate is post-lock exploratory source geometry only, leaves `classifier_authorized=false`, and cannot modify or rescue HYGD-CEXT-1.1.
 
 ## Evidence-Informed v2.0 Options
+
+> **Status correction (2026-09-02):** this section is the historical decision
+> menu written before the manual-geometry gate and HYGD-CEXT-2.0 execution. It
+> is superseded by the completed, closed outcomes in the section below and does
+> not authorize DINOv2 fine-tuning or another candidate now.
 
 No v2.0 classifier/backbone work is authorized or frozen yet. Complete the cheaper manual anatomy gate first if the project owner chooses to continue this lane.
 
@@ -114,6 +123,6 @@ Official/primary references:
 
 ## Post-Lock Geometry Resolution And Completed Next Gate
 
-The separately frozen 36-image blinded boundary annotation is complete. `HYGD-MANUAL-GEOM-1` passed center localization but failed diameter and combined geometry; the original 100 manual-source masks used a synthetic diameter fixed at 25% of image size. A post-hoc scalar repaired same-sample geometry but left dataset-origin accuracy at 0.9420, so the scalar-only lane is closed and no classifier is authorized. See `HYGD_MANUAL_GEOMETRY_RESULT.md`.
+The separately frozen 36-image blinded boundary annotation is complete. `HYGD-MANUAL-GEOM-1` passed its predeclared center-error criterion but failed diameter and combined geometry; the original 100 manual-source masks used a synthetic diameter fixed at 25% of image size. A post-hoc scalar improved same-sample geometry but failed the predeclared dataset-origin gate, so the scalar-only lane is closed and no classifier is authorized. See the privacy-safe aggregate result and private-source hash receipt in `HYGD_MANUAL_GEOMETRY_RESULT.md`.
 
 The separately frozen `HYGD-CEXT-2.0` test was subsequently approved and completed without target access. Frozen full-frame DINOv2-S/14 features improved equal-source mean AUROC to 0.7105 [0.6746, 0.7423] and passed the disease gates, but dataset-origin accuracy was 0.9994 against a required `<0.75`. The independent audit reproduced the result. v2.0 is closed without fallback and Lock B remains blocked; see `HYGD_CEXT_2_0_RESULT.md`.
