@@ -1,4 +1,9 @@
 {
+  "_provenance": {
+    "status": "historical_single_split_development_artifact",
+    "canonical_internal_estimate": false,
+    "warning": "Training history from the historical single-split development run; not a canonical evaluation artifact."
+  },
   "train_loss": [
     0.5210285498717121,
     0.33109408174162713,

@@ -26,5 +26,15 @@ NOTE ON DATA: This license covers the CODE in this repository only. The Hillel
 Yaffe Glaucoma Dataset (HYGD) is distributed separately by PhysioNet under the
 Open Data Commons Attribution License v1.0 (DOI 10.13026/m92s-0z95) and is NOT
 included in or relicensed by this repository. Obtain and cite it per its own
-terms. This project is a student portfolio / research artifact and is not a
-medical device; it must never be used for real diagnostic decisions.
+terms. The current Git tip/tree includes no raw dataset images or row-level
+records. Earlier Git history contains removed dataset-derived visual panels and
+is not sanitized; historical clones may retain those blobs. Tracked aggregate
+statistics, receipts, and EDA charts are research records rather than a grant of
+rights in the underlying data. This project is a student portfolio / research
+artifact and is not a medical device; it must never be used for real diagnostic
+decisions.
+
+Tracked PAPILA- or RIM-ONE-derived aggregate JSON/PNG artifacts are historical
+research records and are not relicensed under MIT. PAPILA redistribution terms
+and RIM-ONE mixed-source compatibility require separate verification; no raw
+external images are included, and the repository grants no external-data rights.

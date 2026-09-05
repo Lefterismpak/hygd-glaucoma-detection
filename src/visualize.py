@@ -37,10 +37,11 @@ def grad_cam_overlay(model, image_tensor, target_layer):
 def review_predictions(y_true, y_prob, n_correct=5, n_wrong=5, seed=42):
     """Sample indices of n_correct correct + n_wrong incorrect predictions for review.
 
-    Returns a dict of {"correct": [indices], "wrong": [indices]}. The actual
-    clinical reflection on *why* each wrong prediction may have happened is a
-    write-up step, not something this function can generate — do it by hand
-    in notebook 04 once the sampled images are visible.
+    Returns a dict of {"correct": [indices], "wrong": [indices]} for local,
+    post-hoc inspection only. Sampled cases and Grad-CAM overlays cannot identify
+    why an error occurred, establish clinical reasoning, or rule out shortcut
+    learning; any interpretation requires a predeclared endpoint and independent
+    adjudication.
     """
     rng = np.random.default_rng(seed)
     y_pred = (y_prob >= 0.5).astype(int)

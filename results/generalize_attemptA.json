@@ -1,11 +1,29 @@
 {
+  "_evidence_status": {
+    "status": "adaptive_development_evidence",
+    "target_blind": false,
+    "transportability_established": false,
+    "license_compatibility": "needs-proof",
+    "external_claim_permitted": false,
+    "warning": "Target AUROC was displayed during development and target-domain anatomical resources influenced preprocessing."
+  },
+  "_uncertainty_provenance": {
+    "status": "historical_image_row_bootstrap_noncanonical",
+    "resampling_unit": "eye_row",
+    "cluster_unit": "patient",
+    "patient_cluster_interval": false,
+    "n_bootstrap": 2000,
+    "seed": 42,
+    "tta_result_producer_identity": "needs-proof",
+    "warning": "Both eyes from a patient were sampled independently; the TTA-producing source is not present in the public repository."
+  },
   "attempt": "A_multisource_disccrop_colornorm_SWA",
   "held_out_papila_auroc": 0.7943,
   "papila_auroc_95ci": [
     0.7426,
     0.8447
   ],
-  "model_selection": "SWA weight-average over epochs>=5 (target-free; PAPILA never used to select)",
+  "model_selection": "SWA weight-average over epochs>=5 using source-validation logic inside the final run; broader development was target-visible",
   "swa_source_val_auroc": 0.9792,
   "prior_zero_shot_papila": 0.5077,
   "prior_singlesource_finetune": 0.6834,
