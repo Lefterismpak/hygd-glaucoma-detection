@@ -202,6 +202,8 @@ def main():
             swa_n += 1
         print(f"    epoch {ep+1}/{a.epochs}  source-val AUROC {va_auc:.3f}   [PAPILA {pap_auc:.3f}]", flush=True)
 
+    # Historical variant: average full states, including BatchNorm buffers.
+    # No post-average activation-statistics recomputation was performed.
     ref = model.state_dict()
     swa_state = {k: (v / swa_n).to(ref[k].dtype).to(ref[k].device) for k, v in swa_sum.items()}
     model.load_state_dict(swa_state)

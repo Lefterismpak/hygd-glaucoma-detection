@@ -14,6 +14,8 @@ Neither frozen image-space branch materially reduced dataset-origin decoding. `S
 
 LEACE reduced the fixed linear origin probe to approximately the source-majority level while preserving most of the disease AUROC. This supports a strong, linearly encoded source component that is partly separable from the measured disease signal in the frozen representation. It is mechanism evidence only: it does not identify a causal image feature, establish unseen-domain transportability, reopen `HYGD-CEXT-2.0`, authorize Lock B, or produce a deployable model.
 
+> **Estimand clarification — 2026-09-06:** S3-CF fits different erasers for the three leave-one-source-out disease analyses and the four-fold origin probe. Its disease and origin scores do not describe one common frozen erased model. S3-GLOBAL uses one map fit on all known sources and remains transductive. The [broader audit](HYGD_REMAINDER_AUDIT_2026_09.md) reproduced all six mean-source point estimates without refitting; original decisions remain unchanged.
+
 ## Frozen Results
 
 | Branch | HYGD AUROC | PAPILA AUROC | RIM-ONE AUROC | Equal-source mean AUROC [95% CI] | Origin mean-fold accuracy | Decision |

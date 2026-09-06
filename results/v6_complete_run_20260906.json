@@ -1,0 +1,170 @@
+{
+  "schema_version": "hygd-completed-v6-summary-v1",
+  "protocol_version": "2026-09-06-v6",
+  "evidence_status": "complete_v6_internal_post_development_run",
+  "execution_date_independently_attested": false,
+  "training_contract": {
+    "loss_aggregation": "sum_weighted_nll_over_sum_target_class_weights",
+    "batchnorm_policy": "running_statistics_adapt_in_all_training_mode_layers"
+  },
+  "primary": {
+    "n": 283,
+    "positives": 183,
+    "negatives": 100,
+    "auroc": 0.9908108108108108,
+    "auroc_95ci": [
+      0.9789536079973695,
+      0.9990035478446332
+    ],
+    "sensitivity": 0.9781420765027322,
+    "specificity": 0.97,
+    "sensitivity_95ci": [
+      0.9553072625698324,
+      0.9947643979057592
+    ],
+    "specificity_95ci": [
+      0.9320333186231244,
+      1.0
+    ],
+    "confusion_tn_fp_fn_tp": [
+      97,
+      3,
+      4,
+      179
+    ]
+  },
+  "estimand": "equal_weight_mean_of_five_outer_fold_linked_group_aurocs",
+  "uncertainty": "5000_fixed_fold_group_bootstrap_replicates_conditional_on_frozen_predictions",
+  "probability_diagnostics": {
+    "status": "post_development_descriptive_only",
+    "used_to_select_model_or_threshold": false,
+    "evaluation_groups": 283,
+    "brier_score": 0.03229341939546363,
+    "log_loss": 0.12539380062215613,
+    "observed_fraction": 0.6466431095406361,
+    "mean_predicted_risk": 0.6734689247640967,
+    "mean_risk_minus_observed_fraction": 0.026825815223460614,
+    "same_sample_prevalence_reference_brier": 0.228495798424253,
+    "recorded_threshold_range": [
+      0.4847812950611114,
+      0.8242746293544769
+    ],
+    "operating_points": {
+      "recorded_inner_thresholds": {
+        "confusion_matrix": [
+          [
+            97,
+            3
+          ],
+          [
+            4,
+            179
+          ]
+        ],
+        "sensitivity": 0.9781420765027322,
+        "specificity": 0.97,
+        "predicted_positive_fraction": 0.6431095406360424
+      },
+      "fixed_0_5_descriptive": {
+        "confusion_matrix": [
+          [
+            90,
+            10
+          ],
+          [
+            1,
+            182
+          ]
+        ],
+        "sensitivity": 0.994535519125683,
+        "specificity": 0.9,
+        "predicted_positive_fraction": 0.6784452296819788
+      }
+    },
+    "reliability_bins": [
+      {
+        "lower": 0.0,
+        "upper": 0.2,
+        "suppressed": false,
+        "groups": 80,
+        "mean_predicted_risk": 0.02897228575307085,
+        "observed_fraction": 0.0125
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "suppressed": true
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "suppressed": true
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "suppressed": false,
+        "groups": 14,
+        "mean_predicted_risk": 0.7186387706723985,
+        "observed_fraction": 0.6428571428571429
+      },
+      {
+        "lower": 0.8,
+        "upper": 1.0,
+        "suppressed": false,
+        "groups": 175,
+        "mean_predicted_risk": 0.9888871936533524,
+        "observed_fraction": 0.9828571428571429
+      }
+    ],
+    "limitations": [
+      "Post-development OOF description; no recalibration, threshold search or prospective assessment.",
+      "Brier score and log loss combine calibration, discrimination and outcome uncertainty.",
+      "The prevalence reference is descriptive and uses these same outcomes; it is not a fitted comparator.",
+      "Bins are sparse and noisy; fewer than ten groups suppresses counts, outcomes and scores.",
+      "Fold-specific models and repeated development limit pooled probability interpretation.",
+      "Threshold variation alone does not prove probability miscalibration.",
+      "No clinical operating point or clinical utility is established."
+    ]
+  },
+  "runtime": {
+    "python": "3.14.6",
+    "torch": "2.13.0",
+    "torchvision": "0.28.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.3",
+    "scikit_learn": "1.9.0",
+    "pillow": "12.2.0"
+  },
+  "private_source_binding": {
+    "result_sha256": "6b386a4f9af1cd1a4def9cd42c599be5e61db8430fcd7db2a20779c3b0d8183f",
+    "result_size_bytes": 24881,
+    "artifact_sha256": {
+      "audit": "74c457652f06519a5ef8106c7915e426d336489200afbb9bb67d2d0f73f25008",
+      "group_folds": "740ecaf2f8fcf1755ceb51e96d30ea1a96545a389c49026223491e0f68d7584e",
+      "oof_images": "b857a6a8b9838d975c9fb1a1a7c4356dc9439de3b8eda76505b193df3ce74623",
+      "oof_groups": "d500ed9289a8f29d2b0606b43c5ebeb29c5a094d6a8e9c7677cd3952eb823455"
+    },
+    "artifact_size_bytes": {
+      "audit": 5551,
+      "group_folds": 3070,
+      "oof_images": 97627,
+      "oof_groups": 14629
+    }
+  },
+  "verifier_sha256": "e1241dcb7e25356b2303b53dc9bacdcb5d5ebbb3bd8f19f3453c204bc84dbf42",
+  "legacy_numerical_validator_sha256": "299278e2699d01c5e5b5209f1c96768f59daaaf980cb919315cfb0f8ec12a9bf",
+  "privacy": {
+    "row_level_data_included": false,
+    "private_paths_included": false,
+    "images_or_weights_included": false
+  },
+  "limitations": [
+    "Only checkpoint/epoch-loss aggregation changed from v5; this is not model or population discovery.",
+    "Gradient updates, BatchNorm adaptation, folds and the historically informed recipe remain fixed.",
+    "The interval omits retraining and recipe/checkpoint/threshold-selection uncertainty.",
+    "Byte/pixel identity checks and supplied IDs do not establish biological-subject independence.",
+    "No external transportability, clinical utility or prospective calibration is established.",
+    "A terminal bundle verifies retained records, not an independently attested execution date."
+  ]
+}

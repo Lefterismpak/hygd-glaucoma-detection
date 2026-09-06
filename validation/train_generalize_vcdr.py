@@ -6,8 +6,7 @@ auxiliary morphology target. A causal or source-invariant effect of this target
 is not established; target AUROC and target-domain resources were visible.
 
 VCDR is supervised only on RIM-ONE, using values derived from its
-dataset-provided masks. HYGD VCDR values were model-predicted from SLO-derived
-images, so HYGD samples are masked out of the VCDR loss while still contributing
+dataset-provided masks. HYGD VCDR values were model-predicted without a validated anatomical reference, so HYGD samples are masked out of the VCDR loss while still contributing
 the classification loss. This is a historical auxiliary-label rule, not proof of
 measurement validity or reliability. PAPILA disease labels are excluded from the
 final training loss, but this is adaptive development evidence: target AUROC was
@@ -196,6 +195,8 @@ def main():
             swa_n += 1
         print(f"    epoch {ep+1}/{a.epochs}  src-val {va_auc:.3f}  [PAPILA {pa:.3f}]", flush=True)
 
+    # Historical variant: average full states, including BatchNorm buffers.
+    # No post-average activation-statistics recomputation was performed.
     ref = model.state_dict()
     model.load_state_dict({k: (v / swa_n).to(ref[k].dtype).to(ref[k].device) for k, v in swa_sum.items()})
     final, Y, P, patient_ids = papila_auc(model, pap, tta=True)
