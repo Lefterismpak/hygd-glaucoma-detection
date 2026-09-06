@@ -81,3 +81,6 @@ docs/superpowers/
 /results/hygd_boundary_adjudication_v1*
 /results/hygd_scale_calibration_feasibility.json
 /results/source_only_localizer_forward_manual_source_prep.json
+
+# Reviewed dataset-free synthetic counterexample, safe aggregate illustration
+!figures/shortcut_counterexample.png

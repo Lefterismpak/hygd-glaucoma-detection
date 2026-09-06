@@ -81,15 +81,15 @@ HYGD uses mean features per linked group; PAPILA uses eye rows; RIM-ONE uses ima
 
 [ShorT](https://www.nature.com/articles/s41467-023-39902-7) shows why encoding a potentially sensitive/source attribute does not, by itself, establish harmful model reliance. The existing HYGD origin-probe gate remains a failed predeclared gate; it cannot be retroactively reinterpreted as a pass. Its 0.9994 accuracy directly establishes source decodability, not the causal mechanism of the disease classifier.
 
-![Synthetic example: source decoding remains perfect while only the source-dependent prediction head collapses](figures/shortcut_counterexample.svg)
+![Synthetic example: source decoding remains perfect while only the source-dependent prediction head collapses](figures/shortcut_counterexample.png)
 
-This figure is generated entirely from synthetic data. Two fixed heads share the same representation: one reads its disease coordinate and the other its source coordinate. Source decoding is perfect for both. After reversing the constructed source/outcome association, disease-head AUROC remains about 0.956 and source-head AUROC falls to 0.051. No medical model or dataset is used. This is an illustrative counterexample, not a new medical result or a novelty claim.
+The PNG is the canonical shareable figure. The initial SVG was removed after native-viewer font substitution and clipping were observed; no scientific values changed. This figure is generated entirely from synthetic data. Two fixed heads share the same representation: one reads its disease coordinate and the other its source coordinate. Source decoding is perfect for both. After reversing the constructed source/outcome association, disease-head AUROC remains about 0.956 and source-head AUROC falls to 0.051. No medical model or dataset is used. This is an illustrative counterexample, not a new medical result or a novelty claim.
 
 ```bash
 # Requires only the existing lightweight scientific dependencies; no dataset.
 python examples/shortcut_counterexample.py
 # Optional static figure; requires the project's existing Matplotlib dependency.
-python examples/shortcut_counterexample.py --figure /tmp/hygd-counterexample.svg
+python examples/shortcut_counterexample.py --figure /tmp/hygd-counterexample.png
 ```
 
 ## Reproduction and verification
