@@ -1,5 +1,7 @@
 # Internal Evaluation Repair
 
+> **Complete current-code execution — 2026-09-06:** The unchanged public v5 evaluator now has an observed complete five-fold run. AUROC **0.9908 [0.9790–0.9990]**; **97 TN / 3 FP / 4 FN / 179 TP**. The older result below remains a separate retrospective record. See the [September report](HYGD_REASSESSMENT_2026_09.md) and [fresh aggregate receipt](results/v5_complete_run_20260906.json).
+
 > Historical run status: metrics from the private 2026-07-11 five-fold result were independently recomputed from the complete OOF files, but its run-start audit remained literally `running`; no contemporaneous terminal audit or public timestamp attestation exists.
 
 > **Public implementation update, 2026-09-04:** The repository now includes the Torch-free evaluation utilities, nested evaluator, synthetic regression tests, lightweight CI, and a privacy-safe [aggregate receipt](results/repaired_internal_evaluation_summary.json). No model was retrained. The `2026-09-04-v5` code performed a read-only aggregate reanalysis of frozen private OOF predictions from a legacy run asserted to date from 2026-07-11; these numbers are not an end-to-end v5 model run and have no contemporaneous public timestamp attestation.
@@ -13,10 +15,10 @@ The historical result remains part of the project history. It is not the preferr
 ## Prospective v5 Protocol
 
 - Detect exact image duplicates with SHA-256.
-- Link patient IDs that share an exact image into one independent evaluation group.
+- Link patient IDs that share an exact image into one evaluation group; biological independence is not established by this linkage.
 - Count each exact image hash once.
 - Fix the model configuration before outer evaluation.
-- Use five stratified outer folds over independent evaluation groups.
+- Use five stratified outer folds over linked evaluation groups.
 - Use a separate stratified inner validation split for best-epoch and threshold selection.
 - Never calculate or display outer-test metrics during training.
 - Save every out-of-fold image prediction.
@@ -25,7 +27,7 @@ The historical result remains part of the project history. It is not the preferr
 - Bootstrap whole evaluation groups within each fixed outer fold for the primary interval.
 - Treat the threshold as cross-validated reporting output, not as a deployment recommendation.
 
-This is the required behavior of the prospective v5 evaluator, not a description of how the legacy model run was executed. Its configuration is fixed before any future v5 outer evaluation, but it came from earlier HYGD development. A future complete run would therefore remain a repaired **post-development internal resampling estimate**, not a prospectively untouched estimate of the entire model-development process.
+This protocol governs the complete September v5 run. It is not a description of how the legacy model run was executed. The configuration was fixed before the new outer evaluation, but came from earlier HYGD development. The complete run therefore remains a repaired **post-development internal resampling estimate**, not a prospectively untouched estimate of the entire model-development process.
 
 ## Public reproduction path
 
@@ -116,7 +118,7 @@ An exploratory perceptual-hash/pixel-correlation scan was also run across differ
 | Pooled group OOF probabilities (continuity only) | 283 | 0.9904 (0.9797-0.9980) | — | — | — |
 | Image (secondary) | 737 | 0.9837 (0.9731-0.9925) | 0.9500 | 0.9289 | 183, 14, 27, 513 |
 
-Outer-fold group AUROCs: 0.9757, 0.9932, 0.9851, 1.0000, 1.0000. Thresholds recorded as inner-validation-selected in the legacy result were 0.7240, 0.9479, 0.4829, 0.8898, and 0.7767; their selection was not independently rerun because the inner prediction rows and bound checkpoint bytes are unavailable. The threshold spread is a calibration warning, not a clinical operating-point recommendation.
+Outer-fold group AUROCs: 0.9757, 0.9932, 0.9851, 1.0000, 1.0000. Thresholds recorded as inner-validation-selected in the legacy result were 0.7240, 0.9479, 0.4829, 0.8898, and 0.7767; their selection was not independently rerun because the inner prediction rows and bound checkpoint bytes are unavailable. The threshold spread is an operating-point stability question, not proof of probability miscalibration or a clinical operating-point recommendation.
 
 The independent post-run check re-read the OOF CSVs, confirmed 737 unique hashes and 283 unique groups with one outer-fold assignment each, and reproduced the pooled group AUROC and confusion matrix exactly. The private read-only v5 aggregate reanalysis then reproduced fold AUROCs 0.9757, 0.9932, 0.9851, 1.0000, and 1.0000; their equal-weight mean is 0.9908 (group-count-weighted sensitivity analysis: 0.9907). It also checked the legacy result's recorded thresholds, best epochs, history structure, and run-start audit for post-hoc consistency; it did not rerun inner selection or bind legacy checkpoint bytes. Exact source-file commitments and aggregate values are recorded in [`results/repaired_internal_evaluation_summary.json`](results/repaired_internal_evaluation_summary.json).
 

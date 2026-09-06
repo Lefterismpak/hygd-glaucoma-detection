@@ -28,6 +28,8 @@ The preprocessing gate required origin accuracy `<= 0.8993917274939172` and equa
 
 ## Negative-Control Warning
 
+> **Interpretation update — 2026-09-06:** The shared historical control shuffles image rows within source, breaking linked-subject/paired-eye label structure. A single shuffled-label fit does not define a subject-exchangeable null or a significance test. See the [September control audit](HYGD_REASSESSMENT_2026_09.md). This qualifies the warning below; it does not explain the exact high score, alter frozen numbers, promote a branch or reopen a historical gate.
+
 RIM-ONE permutation AUROC remained high across branches: S1 0.7081, S2 0.6759, S3-CF 0.7513, and S3-GLOBAL 0.7439. Its exact mechanism remains `needs-proof`. These controls limit interpretation of the RIM-ONE disease AUROCs and are one reason not to promote any branch.
 
 ## Runtime Correction

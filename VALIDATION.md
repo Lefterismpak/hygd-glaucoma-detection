@@ -1,5 +1,7 @@
 # Validation & Honesty Statement
 
+> **Current execution — 2026-09-06:** A complete run of the unchanged v5 recipe is now observed and verified. Mean outer-fold AUROC **0.9908 [0.9790–0.9990]**, sensitivity **0.9781**, specificity **0.9700**, confusion **97/3/4/179**. The historical reanalysis below remains separately labeled. [Fresh aggregate receipt](results/v5_complete_run_20260906.json) · [September methods, control audit and limitations](HYGD_REASSESSMENT_2026_09.md).
+
 > **Status correction (2026-09-04):** The historical `0.988 +/- 0.008` CV is superseded because the configuration was chosen after a development-test comparison and each fold was reused for checkpoint selection and scoring. The preferred internal estimate below is a v5 read-only aggregate reanalysis of frozen predictions from a private model run asserted to date from 2026-07-11; no contemporaneous public timestamp attests that run and no end-to-end v5 model run is claimed. External-recovery results remain adaptive development evidence, not untouched external validation. Later locked source-only qualifications did not establish transportability. See the [aggregate receipt](results/repaired_internal_evaluation_summary.json) and [HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md](HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md).
 
 This document separates the evidence that remains usable from the historical artifacts that are retained only for provenance. A high AUC is easy to inflate; the point is to preserve the failures and limitations alongside the attractive numbers.
@@ -13,11 +15,11 @@ Historical numbers are read from committed development artifacts. The repaired r
 - **Preferred internal metrics:** duplicate-aware evaluation-group AUROC, sensitivity, specificity, confusion matrix, and group-cluster-bootstrap 95% confidence intervals from outer-fold OOF predictions.
 - **Historical development metrics:** one test split, image-row bootstrap, threshold sweep, and the invalidated five-fold robustness estimate. They document model development; they are not a final untouched test.
 
-## Internal evaluation hierarchy
+## Previous internal reanalysis (retained provenance)
 
 The original work grouped supplied patient IDs, but a later audit found three residual threats: configurations were compared on the development test split; the old five-fold loop selected a checkpoint and reported performance on the same fold; and exact images appeared under different supplied patient IDs.
 
-The repaired protocol hashes every image, counts each exact hash once, links patient IDs that share a hash into one independent evaluation group, fixes the model recipe before outer evaluation, uses a separate inner group split for checkpoint and threshold selection, and scores each outer group once.
+The repaired protocol hashes every image, counts each exact hash once, links patient IDs that share a hash into one evaluation group (without proving biological independence), fixes the model recipe before outer evaluation, uses a separate inner group split for checkpoint and threshold selection, and scores each outer group once.
 
 | Metric | Value |
 |---|---|
@@ -34,7 +36,7 @@ The primary discrimination estimand averages the five group-level outer-fold AUR
 
 - **The in-distribution numbers above are single-dataset** — one hospital (Hillel Yaffe Medical Center), one camera (TOPCON DRI OCT Triton). They do not establish transportability.
 - **It is not a clinical device** and must never be used for real diagnostic decisions.
-- **Calibration, clinical utility, and deployment performance are unproved.** Fold-specific inner-validation thresholds ranged from 0.483 to 0.948; no fixed operating point is recommended.
+- **Prospective calibration, clinical utility, and deployment performance are unproved.** September adds descriptive probability diagnostics. Legacy thresholds ranged from 0.483 to 0.948; fresh thresholds range from 0.485 to 0.824. Neither range establishes calibration or a clinical operating point.
 - **The historical 44-ID split and its image-row intervals are development artifacts**, not an untouched test or the uncertainty source for the preferred result.
 - **Historical Grad-CAM is not validation evidence.** The post hoc saliency review had no predeclared localization endpoint or independent expert adjudication. It cannot establish causal feature use, correct localization, clinical reasoning, or absence of shortcut learning; its row-level panels and interpretations were removed from the public evidence package.
 
