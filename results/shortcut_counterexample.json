@@ -1,0 +1,19 @@
+{
+  "evidence_type": "synthetic_counterexample_not_medical_evidence",
+  "seed": 20260906,
+  "samples_per_environment": 2000,
+  "medical_data_used": false,
+  "models_trained": false,
+  "representation": "same two coordinates for both heads: noisy disease and exact source",
+  "intervention": "constructed reversal of source/outcome association; no change in disease mechanism",
+  "development": {
+    "source_decoding_accuracy": 1.0,
+    "disease_head_auroc": 0.959422,
+    "source_head_auroc": 0.95
+  },
+  "reversed_source_association": {
+    "source_decoding_accuracy": 1.0,
+    "disease_head_auroc": 0.956422,
+    "source_head_auroc": 0.05050000000000002
+  }
+}
