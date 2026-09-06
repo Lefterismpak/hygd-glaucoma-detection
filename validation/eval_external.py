@@ -18,16 +18,21 @@ Usage:
 
 import argparse
 import io
+import hashlib
 import json
 import sys
 from pathlib import Path
 
 import numpy as np
+from scipy.special import expit
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from validation.predict import load_model, predict_probs  # noqa: E402
+from validation.calibration_fitting import (  # noqa: E402
+    TEMPERATURE_BOUNDS, bernoulli_nll, fit_positive_temperature,
+)
 from validation.evaluation_utils import (  # noqa: E402
     assert_fresh_output_bundle,
     atomic_write_text,
@@ -73,23 +78,9 @@ def brier(y, p):
     return float(np.mean((p - y) ** 2))
 
 
-def fit_temperature(logits, y, iters=200, lr=0.05):
-    """1-param temperature scaling on the effective logit (minimize NLL)."""
-    import torch
-    z = torch.tensor(logits, dtype=torch.float64)
-    t = torch.ones(1, dtype=torch.float64, requires_grad=True)
-    yy = torch.tensor(y, dtype=torch.float64)
-    opt = torch.optim.LBFGS([t], lr=lr, max_iter=iters)
-
-    def closure():
-        opt.zero_grad()
-        p = torch.sigmoid(z / t.clamp_min(1e-3))
-        nll = -(yy * torch.log(p + EPS) + (1 - yy) * torch.log(1 - p + EPS)).mean()
-        nll.backward()
-        return nll
-
-    opt.step(closure)
-    return max(float(t.detach().item()), 1e-3)
+def fit_temperature(logits, y):
+    """Positive, bounded calibration-only fit; historical scalar clamp repaired."""
+    return fit_positive_temperature(logits, y)
 
 
 def main():
@@ -126,7 +117,9 @@ def main():
     print(f"[{args.name}] {len(df)} images, {df['patient_id'].nunique()} supplied group IDs, "
           f"{y.mean():.1%} glaucoma prevalence")
 
-    p = predict_probs([str(x) for x in df["image_path"]], model)
+    image_sha256s = [read_verified_file_bytes(path)[1] for path in df["image_path"]]
+    p = predict_probs([str(x) for x in df["image_path"]], model,
+                      expected_image_sha256s=image_sha256s)
     z = _logit(p)
 
     # --- zero-shot discrimination + raw calibration on the full set ---
@@ -174,6 +167,7 @@ def main():
         "dataset": args.name, "n_images_or_eyes": int(len(y)),
         "n_supplied_group_ids": int(df["patient_id"].nunique()),
         "labels_csv_sha256": labels_sha256,
+        "image_byte_sequence_sha256": hashlib.sha256("\n".join(image_sha256s).encode()).hexdigest(),
         "checkpoint_sha256": model.checkpoint_sha256,
         "subject_independence": "needs-proof",
         "subject_mapping_status": (
@@ -214,7 +208,7 @@ def main():
         }
     }
     T = fit_temperature(zc, yc)
-    pe_temp = 1 / (1 + np.exp(-ze / T))
+    pe_temp = expit(ze / T)
     from sklearn.linear_model import LogisticRegression
     platt = LogisticRegression().fit(zc.reshape(-1, 1), yc)
     platt_coefficient = float(platt.coef_[0, 0])
@@ -232,6 +226,11 @@ def main():
 
     recal.update({
         "temperature": round(T, 3),
+        "temperature_fit_method": "bounded_log_temperature_exact_bernoulli_nll",
+        "temperature_bounds": list(TEMPERATURE_BOUNDS),
+        "temperature_at_boundary": bool(T in TEMPERATURE_BOUNDS),
+        "temperature_calibration_nll": bernoulli_nll(zc, yc, T),
+        "temperature_unscaled_calibration_nll": bernoulli_nll(zc, yc, 1.0),
         "platt_coefficient": platt_coefficient,
         "platt_intercept": float(platt.intercept_[0]),
         "platt_strictly_increasing": platt_coefficient > 0,

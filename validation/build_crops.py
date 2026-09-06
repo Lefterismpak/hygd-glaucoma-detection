@@ -10,6 +10,7 @@ rejected because it introduced a new dataset signature.
 """
 
 import os
+import sys
 from pathlib import Path
 
 import cv2
@@ -18,6 +19,9 @@ import pandas as pd
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from validation.evaluation_utils import assert_fresh_output_bundle, atomic_write_bytes, atomic_write_text
 DATA = ROOT / "validation/data"
 PROC = ROOT / "data/processed/crops"
 K = 2.2
@@ -69,7 +73,14 @@ def process_one(path, cx, cy, diam, k=K, size=SIZE):
 
 
 def build():
+    assert_fresh_output_bundle([DATA / "crop_manifest.csv"])
     coords = pd.read_csv(DATA / "disc_coords.csv")
+    planned = [PROC / ds / (Path(row["image_path"]).stem + ".png")
+               for ds in ["HYGD", "PAPILA", "RIMONE"]
+               for _, row in coords[coords.dataset == ds].iterrows()]
+    if len(planned) != len(set(planned)):
+        raise ValueError("Crop rows must not map to duplicate output paths")
+    assert_fresh_output_bundle([*planned, ROOT / "figures/dg_crops_contact_sheet.png"])
     manifest = []
     for ds in ["HYGD", "PAPILA", "RIMONE"]:
         (PROC / ds).mkdir(parents=True, exist_ok=True)
@@ -81,12 +92,15 @@ def build():
                 continue
             stem = os.path.splitext(os.path.basename(r["image_path"]))[0]
             outp = PROC / ds / f"{stem}.png"
-            cv2.imwrite(str(outp), cv2.cvtColor(crop, cv2.COLOR_RGB2BGR))
+            success, encoded = cv2.imencode(".png", cv2.cvtColor(crop, cv2.COLOR_RGB2BGR))
+            if not success:
+                raise ValueError("Crop PNG encoding failed")
+            atomic_write_bytes(outp, encoded.tobytes())
             manifest.append({"dataset": ds, "crop_path": str(outp), "orig": r["image_path"], "stem": stem})
             n += 1
         print(f"  {ds}: {n} crops")
     mf = pd.DataFrame(manifest)
-    mf.to_csv(DATA / "crop_manifest.csv", index=False)
+    atomic_write_text(DATA / "crop_manifest.csv", mf.to_csv(index=False))
 
     # contact sheets
     ROOT.joinpath("figures").mkdir(exist_ok=True)
@@ -106,6 +120,7 @@ def build():
 def dataset_probe(mf):
     """Describe dataset separability from downsized normalized-crop pixels.
 
+    This historical probe splits image rows; related subjects may cross folds.
     Near-chance accuracy is compatible with this probe lacking source signal; it
     does not prove that shortcuts were removed or that transfer will succeed.
     """
@@ -119,9 +134,9 @@ def dataset_probe(mf):
     X, y = np.array(X), np.array(y)
     acc = cross_val_score(LogisticRegression(max_iter=500), X, y, cv=4).mean()
     chance = max(np.bincount(y)) / len(y)
-    print(f"\n== DATASET-PROBE GATE ==")
+    print(f"\n== HISTORICAL IMAGE-ROW DATASET PROBE (NONQUALIFYING) ==")
     print(f"  3-way dataset classification accuracy: {acc:.3f}  (chance/majority = {chance:.3f})")
-    print(f"  {'PASS-ish: crops are hard to tell apart' if acc < 0.75 else 'WARN: shortcut still present — crops remain dataset-separable'}")
+    print("  This measures source decodability under image-row CV, not causal reliance or transportability.")
     return acc, chance
 
 

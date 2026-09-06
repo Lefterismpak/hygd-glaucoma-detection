@@ -22,6 +22,7 @@ from PIL import Image
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.experiments import build_model, build_transforms  # noqa: E402
+from src.data_utils import load_verified_rgb_image  # noqa: E402
 from validation.evaluation_utils import load_torch_state_dict_safely  # noqa: E402
 
 _EVAL_TF = build_transforms(train=False)
@@ -48,35 +49,45 @@ def load_model(
 
 
 @torch.no_grad()
-def predict_prob(image_path, model, device="cpu"):
+def predict_prob(image_path, model, device="cpu", *, expected_image_sha256=None):
     """Return P(glaucoma / GON+) for a single fundus image path.
 
     Uses the exact eval transform the model was validated with. This is the
     function every external-validation script should call — do not re-implement
     preprocessing anywhere else.
     """
-    img = Image.open(image_path).convert("RGB")
+    if model.training:
+        raise ValueError("Inference requires a model in evaluation mode")
+    img = load_verified_rgb_image(image_path, expected_sha256=expected_image_sha256)
     x = _EVAL_TF(img).unsqueeze(0).to(device)
     prob = torch.softmax(model(x), dim=1)[0, 1].item()
+    if not np.isfinite(prob) or not 0 <= prob <= 1:
+        raise ValueError("Model emitted an invalid probability")
     return float(prob)
 
 
 @torch.no_grad()
-def predict_probs(image_paths, model, device="cpu"):
-    """Vectorized convenience wrapper: list of paths -> np.array of P(glaucoma)."""
-    return np.array([predict_prob(p, model, device) for p in image_paths])
+def predict_probs(image_paths, model, device="cpu", *, expected_image_sha256s=None):
+    """Single-image loop returning one bounded probability per verified path."""
+    image_paths = list(image_paths)
+    digests = [None] * len(image_paths) if expected_image_sha256s is None else list(expected_image_sha256s)
+    if len(digests) != len(image_paths):
+        raise ValueError("One expected image digest is required per input path")
+    return np.array([predict_prob(p, model, device, expected_image_sha256=h)
+                     for p, h in zip(image_paths, digests)])
 
 
 if __name__ == "__main__":
     import argparse
 
-    ap = argparse.ArgumentParser(description="P(glaucoma) for one fundus image")
+    ap = argparse.ArgumentParser(description="Research-only uncalibrated GON+ model score for one image")
     ap.add_argument("image")
     ap.add_argument("--checkpoint", required=True)
     ap.add_argument("--checkpoint-sha256", required=True)
+    ap.add_argument("--image-sha256")
     args = ap.parse_args()
     m = load_model(
         args.checkpoint,
         expected_checkpoint_sha256=args.checkpoint_sha256,
     )
-    print(f"{args.image}\tP(glaucoma)={predict_prob(args.image, m):.6f}")
+    print(f"{args.image}\tuncalibrated_GON_plus_score={predict_prob(args.image, m, expected_image_sha256=args.image_sha256):.6f}")
