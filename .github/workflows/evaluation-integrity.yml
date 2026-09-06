@@ -37,3 +37,33 @@ jobs:
 
       - name: Run synthetic integrity and public-claim tests
         run: python -m unittest discover -s validation -p 'test_*.py' -v
+
+  torch-numerics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install the CPU test runtime
+        run: |
+          python -m pip install --requirement requirements-ci.txt
+          python -m pip install torch==2.13.0 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install opencv-python-headless==5.0.0.93
+      - name: Exercise real loss, inference and mask target paths without downloads
+        run: |
+          python -m unittest validation.test_training_objectives validation.test_inference_parity \
+            validation.test_mask_targets.MaskTargetTests.test_real_segmentation_dataset_normalizes_png_masks_before_bce \
+            validation.test_mask_targets.MaskTargetTests.test_preparation_entrypoints_preserve_existing_frozen_outputs \
+            validation.test_evaluation_utils.EvaluationUtilsTests.test_full_checkpoint_architecture_never_requests_pretrained_weights \
+            validation.test_evaluation_utils.EvaluationUtilsTests.test_safe_checkpoint_round_trip_is_hash_bound_and_fresh -v
