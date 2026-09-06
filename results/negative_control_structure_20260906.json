@@ -1,0 +1,65 @@
+{
+  "analysis": "retrospective exchangeability audit only; no fitting/inference",
+  "folds": {
+    "hygd": {
+      "PAPILA": {
+        "rows": 420,
+        "groups": 210,
+        "original_mixed_label_groups": 7,
+        "shuffled_mixed_label_groups": 67,
+        "previously_consistent_groups_broken": 65,
+        "single_permutation_only": true
+      },
+      "RIMONE": {
+        "rows": 485,
+        "groups": 485,
+        "original_mixed_label_groups": 0,
+        "shuffled_mixed_label_groups": 0,
+        "previously_consistent_groups_broken": 0,
+        "single_permutation_only": true
+      }
+    },
+    "papila": {
+      "HYGD": {
+        "rows": 737,
+        "groups": 283,
+        "original_mixed_label_groups": 0,
+        "shuffled_mixed_label_groups": 112,
+        "previously_consistent_groups_broken": 112,
+        "single_permutation_only": true
+      },
+      "RIMONE": {
+        "rows": 485,
+        "groups": 485,
+        "original_mixed_label_groups": 0,
+        "shuffled_mixed_label_groups": 0,
+        "previously_consistent_groups_broken": 0,
+        "single_permutation_only": true
+      }
+    },
+    "rimone": {
+      "HYGD": {
+        "rows": 737,
+        "groups": 283,
+        "original_mixed_label_groups": 0,
+        "shuffled_mixed_label_groups": 100,
+        "previously_consistent_groups_broken": 100,
+        "single_permutation_only": true
+      },
+      "PAPILA": {
+        "rows": 420,
+        "groups": 210,
+        "original_mixed_label_groups": 7,
+        "shuffled_mixed_label_groups": 57,
+        "previously_consistent_groups_broken": 53,
+        "single_permutation_only": true
+      }
+    }
+  },
+  "source_hashes": {
+    "fold_hygd": "114d56b72aab7abc2cf382c1167bcb19c43aab0abac603619a55dbe615fffdeb",
+    "fold_papila": "ab7de1b449b44604cbb9c1f580637e62ca2ffbaf72d5ed67726ef564807926fb",
+    "fold_rimone": "ad931e5166d54f42813ae21bca10822986936fb9913b9efee3bf3d75fb68f4c2",
+    "historical_evaluator": "d4a57d928a44e94f2b5b426d06bc28a10020f00d2a99519630d691f19acdd34e"
+  }
+}

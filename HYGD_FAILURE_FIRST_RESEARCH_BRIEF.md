@@ -1,8 +1,10 @@
 # HYGD Failure-First Glaucoma AI Audit
 
-**Status:** reviewer brief; claim hierarchy updated 2026-09-04
+**Status:** reviewer brief; claim hierarchy updated 2026-09-06
 
-**Bottom line:** the project demonstrates strong discrimination inside one
+**New:** [September reassessment](HYGD_REASSESSMENT_2026_09.md) — complete v5 model execution, descriptive probability checks, a measured permutation-structure defect and reproducible control diagnostics.
+
+**Research conclusion:** the project demonstrates strong discrimination inside one
 single-site fundus dataset, but it does not establish transportability to a new
 clinic or camera. The main contribution is the evaluation and audit sequence
 that exposed this boundary, prevented weak candidates from being promoted, and
@@ -36,7 +38,7 @@ performance. A later audit found three reasons to narrow that interpretation:
 2. HYGD contained exact duplicate images under different supplied patient IDs.
    A repaired protocol linked those IDs, counted each hash once, separated
    inner validation from outer scoring, and stored one out-of-fold prediction
-   per independent evaluation group.
+   per linked evaluation group; biological independence remains unproved.
 3. Attractive PAPILA and RIM-ONE recovery results came from an adaptive
    development process. Target AUROC was displayed during development, and
    target anatomical resources affected preprocessing. Those results are useful
@@ -58,13 +60,14 @@ remove that signal.
 | Stage | Result | Current interpretation |
 | --- | --- | --- |
 | Historical HYGD development | Test AUROC 0.976; CV AUROC 0.988 +/- 0.008 | Superseded as the preferred internal estimate |
-| Repaired HYGD evaluation | Mean outer-fold duplicate-aware group AUROC **0.9908**, conditional 95% CI **0.9790-0.9990**, 283 groups | Read-only v5 aggregate reanalysis of frozen private OOF predictions from a run asserted to date from 2026-07-11; no contemporaneous public timestamp, retraining, or end-to-end v5 model run |
+| Complete v5 execution (2026-09-06) | Mean outer-fold group AUROC **0.9908 [0.9790–0.9990]**; sensitivity **0.9781**, specificity **0.9700** | Current fixed recipe actually executed; internal post-development evidence, not a new population |
+| Previous repaired HYGD reanalysis | Mean outer-fold duplicate-aware group AUROC **0.9908**, conditional 95% CI **0.9790-0.9990**, 283 groups | Read-only v5 aggregate reanalysis of frozen private OOF predictions from a run asserted to date from 2026-07-11; no contemporaneous public timestamp, retraining, or end-to-end v5 model run |
 | Historical adaptive recovery | PAPILA **0.857 +/- 0.019**; RIM-ONE **0.915 +/- 0.012** | Five-run sample mean +/- SD, not CIs; target-adaptive development, noncanonical per-run intervals, subject/license boundaries `needs-proof` |
 | HYGD-CEXT-1.1 | Equal-source mean AUROC **0.6227**, 95% CI **0.5822-0.6632** | Failed source-only qualification; confirmatory target-access gate ("Lock B") blocked |
 | HYGD-CEXT-2.0 | Equal-source mean AUROC **0.7105**, 95% CI **0.6746-0.7423**; origin accuracy **0.9994** | Disease gate passed; decisive shortcut gate failed |
 | Shortcut S2 | Equal-source mean AUROC **0.7364**; origin accuracy **0.9933** | Fixed preprocessing did not repair source decoding |
 | Cross-fitted LEACE | Equal-source mean AUROC **0.7096**; origin accuracy **0.4488** | Mechanism evidence only, not a deployable repair |
-| RIM-ONE permutation controls | AUROC **0.6759-0.7513** across later branches | Mechanism `needs-proof`; limits disease-AUROC interpretation |
+| RIM-ONE permutation controls | AUROC **0.6759-0.7513** across later branches | September audit: row shuffling breaks group label structure; high-score mechanism still `needs-proof` |
 
 The critical pattern is not that every disease AUROC collapsed. It is that
 disease discrimination could improve while source identity remained nearly
@@ -79,8 +82,8 @@ performance claim without written clarification.
 
 ## What The Evidence Supports
 
-- HYGD contains a strong in-distribution glaucoma signal under duplicate-aware,
-  linked-group resampling.
+- The model strongly discriminates HYGD dataset labels under duplicate-aware,
+  linked-group resampling; the biological and acquisition contributions are not isolated.
 - Single-site ranking performance can remain high after repairing known split,
   duplicate, and threshold-selection defects.
 - Acquisition and dataset identity are strongly represented in both the
@@ -125,8 +128,8 @@ was not promoted.
 
 ## Questions For A PI Or Clinical Reviewer
 
-1. Given near-perfect source decoding, which anatomy-aware or domain-invariance
-   hypothesis is scientifically worth freezing next?
+1. Which controlled intervention and subject-exchangeable null can test whether
+   the disease predictor actually relies on a nuisance factor, beyond decoding source identity?
 2. Which independent dataset, evaluation unit, and clinically meaningful
    endpoint would make a next study decision-useful rather than another
    benchmark exercise?
@@ -135,7 +138,7 @@ was not promoted.
 
 ## Current Stop Rule And Revisit Trigger
 
-Further model iteration is parked. It should reopen only when at least one of
+The September internal rerun and retrospective diagnostics are complete; the historical qualification gates remain closed. Further model optimization needs a separately designed study. It should reopen only when at least one of
 the following becomes available:
 
 - a properly licensed retina-specific or general foundation model with
@@ -156,6 +159,8 @@ aggregate receipt. Private row-level predictions, checkpoints, data, and run
 bundles remain unpublished. Their SHA-256 commitments do not make the numerical
 result publicly reproducible or prove a contemporaneous 2026-07-11 timestamp.
 
+- [September reassessment and next-study recommendation](HYGD_REASSESSMENT_2026_09.md)
+- [Complete v5 run aggregate receipt](results/v5_complete_run_20260906.json)
 - [Internal evaluation repair](INTERNAL_EVALUATION_REPAIR.md)
 - [Aggregate-only internal evidence receipt](results/repaired_internal_evaluation_summary.json)
 - [Source-only qualification report](SOURCE_ONLY_QUALIFICATION_REPORT.md)

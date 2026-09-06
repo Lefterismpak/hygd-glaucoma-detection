@@ -12,9 +12,9 @@
 
 ## Answer
 
-The frozen full-frame DINOv2 representation improved disease discrimination across all three held-out sources and passed every predeclared AUROC and confidence-interval condition. It nevertheless retained almost perfect dataset identity: the four-fold group-aware dataset-origin probe reached **0.9994** accuracy against a `<0.75` gate. `HYGD-CEXT-2.0` therefore fails and closes without a fallback candidate.
+The frozen full-frame DINOv2 representation improved disease AUROC on HYGD and PAPILA and increased the equal-source mean; RIM-ONE decreased from 0.7811 to 0.7457. Every predeclared AUROC and confidence-interval condition passed. The representation nevertheless retained almost perfect dataset identity: the four-fold group-aware dataset-origin probe reached **0.9994** accuracy against a `<0.75` gate. `HYGD-CEXT-2.0` therefore fails and closes without a fallback candidate.
 
-This is a useful negative result. A stronger generic representation raised source-only disease AUROC while dataset identity remained nearly perfectly linearly decodable. Acquisition/source shortcut is the leading interpretation, not causal proof. The result does not establish a transportable glaucoma model and does not authorize target access, clinical use, publication claims, fine-tuning, or model hopping.
+This is a useful negative result. A stronger generic representation raised source-only disease AUROC while dataset identity remained nearly perfectly linearly decodable. The origin probe establishes source decodability, not whether the disease classifier causally relies on source information. That reliance remains unproved. The result does not establish a transportable glaucoma model and does not authorize target access, clinical use, publication claims, fine-tuning, or model hopping.
 
 RIM-ONE mixed-source use compatibility remains `needs-proof`; no external or publication performance claim is permitted from this mixed-source evidence.
 
@@ -73,6 +73,8 @@ The fixed four-fold `StratifiedGroupKFold` origin probe produced:
 The shortcut gate failed overwhelmingly. The DINOv2 features make the three datasets almost perfectly distinguishable.
 
 ## Negative-Control Caution
+
+> **Interpretation update — 2026-09-06:** Replaying the historical training-label shuffle without fitting showed that it breaks subject-level label structure: for the RIM-ONE-held-out fold it made 100 previously consistent HYGD groups and 53 PAPILA groups mixed-label. It is a single image-row perturbation, not a subject-exchangeable permutation null. A separate fixed random-direction diagnostic found 15/1024 directions with RIM-ONE AUROC ≥0.75; this is not a p-value or an explanation of the exact permutation model. The [September report](HYGD_REASSESSMENT_2026_09.md) states the provenance and limits. The original numeric results and failed gate remain unchanged.
 
 The fixed RIM-ONE permutation control reached AUROC **0.7468**, essentially the same as the disease model's **0.7457**, despite a low correlation between their image probabilities (`-0.0783`). This control is not a promotion gate and one fixed permutation cannot identify the mechanism. It is, however, independently reproducible and materially weakens any causal interpretation of the RIM-ONE disease AUROC. The exact cause remains `needs-proof`; the near-perfect origin probe makes residual source/acquisition structure the leading concern.
 

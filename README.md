@@ -1,8 +1,10 @@
-# HYGD Glaucoma Detection from Fundus Images: Baseline Classification, Explainability, and Clinical Error Analysis
+# HYGD: Failure-First Glaucoma AI Evaluation
 
-> **Evidence status (updated 2026-09-04):** the preferred internal discrimination estimate is a read-only aggregate reanalysis of frozen OOF predictions from a private five-fold model run asserted to date from 2026-07-11: mean outer-fold linked-group AUROC **0.9908** (conditional 95% CI **0.9790-0.9990**; 283 groups). No contemporaneous public timestamp attests that legacy run, and no model was retrained. The current public implementation is `2026-09-04-v5`; no end-to-end v5 model run is claimed for these numbers. See the privacy-safe [aggregate receipt](results/repaired_internal_evaluation_summary.json).
+> **New evidence — 2026-09-06:** A complete run of the unchanged v5 evaluator now reproduces mean outer-fold linked-group AUROC **0.9908 [0.9790–0.9990]** over 283 groups, with **97 TN / 3 FP / 4 FN / 179 TP** at inner-selected thresholds. New probability diagnostics, an exchangeability audit and a frozen representation diagnostic add evidence about what the score does and does not establish. [September reassessment](HYGD_REASSESSMENT_2026_09.md) · [Fresh aggregate receipt](results/v5_complete_run_20260906.json). **Internal post-development evidence; transportability remains unproved.**
 >
-> **Bottom line:** transportability is not established. Later locked source-only tests and shortcut controls prevented the attractive development results from being promoted as external validation or clinical evidence.
+> **Previous evidence snapshot (2026-09-04; legacy run only):** the preferred internal discrimination estimate is a read-only aggregate reanalysis of frozen OOF predictions from a private five-fold model run asserted to date from 2026-07-11: mean outer-fold linked-group AUROC **0.9908** (conditional 95% CI **0.9790-0.9990**; 283 groups). No contemporaneous public timestamp attests that legacy run, and no model was retrained. The current public implementation is `2026-09-04-v5`; no end-to-end v5 model run is claimed for these numbers. See the privacy-safe [aggregate receipt](results/repaired_internal_evaluation_summary.json).
+>
+> **Research conclusion:** transportability is not established. Later locked source-only tests and shortcut controls prevented the attractive development results from being promoted as external validation or clinical evidence.
 >
 > **Start here:** [HYGD Failure-First Glaucoma AI Audit](HYGD_FAILURE_FIRST_RESEARCH_BRIEF.md) - a concise map of what was tested, what failed, what the evidence supports, and what would justify a genuinely different next study.
 
@@ -21,7 +23,8 @@ Build a reproducible baseline classifier for glaucoma detection from retinal fun
 | Status | Evidence | Meaning |
 |---|---|---|
 | `historical` | Single-split AUROC 0.976; CV AUROC 0.988 +/- 0.008 | Development results retained but superseded as the preferred internal estimate |
-| `preferred internal` | [Duplicate-aware repair](INTERNAL_EVALUATION_REPAIR.md): mean outer-fold group AUROC 0.9908 [0.9790-0.9990] | Scale-robust strong in-distribution discrimination; single-site post-development resampling only |
+| `fresh complete internal` | [September v5 run](HYGD_REASSESSMENT_2026_09.md): AUROC 0.9908 [0.9790–0.9990]; sensitivity 0.9781, specificity 0.9700 | Current code executed end to end; same historically informed single-site recipe |
+| `previous internal reanalysis` | [Duplicate-aware repair](INTERNAL_EVALUATION_REPAIR.md): mean outer-fold group AUROC 0.9908 [0.9790-0.9990] | Scale-robust strong in-distribution discrimination; single-site post-development resampling only |
 | `adaptive development` | PAPILA/RIM-ONE recovery chronology in [VALIDATION.md](VALIDATION.md) and [validation/FINDINGS.md](validation/FINDINGS.md) | Historical development evidence, not untouched external validation |
 | `failed confirmatory` | [HYGD-CEXT-1.1](SOURCE_ONLY_QUALIFICATION_REPORT.md) and [HYGD-CEXT-2.0](HYGD_CEXT_2_0_RESULT.md) | Source-only qualification did not establish transportability; the confirmatory target-access gate remains blocked |
 | `mechanism only` | [Shortcut Map 1](HYGD_SHORTCUT_MAP_1_RESULT.md) | Source signal is strongly encoded; no bounded preprocessing repair was found |
@@ -68,11 +71,15 @@ Within that historical development comparison, progressively unfreezing the last
 
 The historical training chart was removed for the same reason; the run-level losses remain provenance, not proof against overfitting.
 
-### Preferred internal estimate: duplicate-aware inner/outer evaluation
+### Complete v5 execution and the previous internal reanalysis
+
+The complete 2026-09-06 run used the unchanged public v5 code, the fixed recipe and the canonical group folds. It produced the same mean-fold AUROC and conditional interval as the retrospective reanalysis below, but different thresholded decisions: **97 TN / 3 FP / 4 FN / 179 TP**. Its sensitivity is **0.9781** and specificity **0.9700**. Group Brier score is **0.0323**, log loss **0.1254**, and mean predicted risk exceeds the observed frequency by **2.68 percentage points**. These descriptive checks do not establish prospective calibration or clinical utility. See the [complete result and limitations](HYGD_REASSESSMENT_2026_09.md).
+
+The following table and legacy-threshold discussion preserve the **previous retrospective result** for comparison; they are not the fresh run's operating-point numbers.
 
 The historical CV AUROC of `0.988 +/- 0.008` grouped supplied patient IDs, but it reused each fold for checkpoint selection and scoring, and it missed exact images duplicated under different patient IDs. It is superseded, not erased.
 
-The repaired protocol links patient IDs that share an exact image, counts each SHA-256 hash once, fixes the model recipe before outer evaluation, uses a separate inner validation split for checkpoint and threshold selection, and evaluates every independent outer group once.
+The repaired protocol links patient IDs that share an exact image, counts each SHA-256 hash once, fixes the model recipe before outer evaluation, uses a separate inner validation split for checkpoint and threshold selection, and evaluates every linked outer group once. Linked IDs are not independent proof of biological-subject identity.
 
 | Analysis level | N | AUROC (95% conditional CI) | Sensitivity | Specificity |
 |---|---:|---:|---:|---:|
@@ -109,6 +116,8 @@ python -m unittest discover -s validation -p 'test_*.py' -v
 python validation/internal_evaluation_repair.py --audit-only
 python validation/internal_evaluation_repair.py
 python validation/reanalyze_frozen_oof.py --describe-contract
+python validation/summarize_completed_run.py --describe-contract
+python examples/shortcut_counterexample.py
 ```
 
 Generated audit, fold, OOF, and result files stay under the git-ignored `results/internal_evaluation_repair*` namespace and are not publication artifacts. The historical single-split runner is gated behind `--run-historical-comparison`, emits no cross-validation estimate, and is not the canonical path; inspect its policy with `python run_v2_experiments.py --describe-policy`.
@@ -136,18 +145,18 @@ The retrospective threshold sweep on that same split was:
 | 0.50 (default) | 0.954 | 0.941 | 3 | 2 |
 | 0.64 | 0.938 | 0.941 | 4 | 2 |
 
-In the repaired internal evaluation, thresholds selected independently inside the five training folds ranged from 0.483 to 0.948. That spread is a calibration warning. No fixed clinical threshold is justified by this project.
+The previous run recorded thresholds from 0.483 to 0.948; the fresh v5 run selected thresholds from 0.485 to 0.824. This variation raises an operating-point stability question, but does not by itself prove probability miscalibration. No fixed clinical threshold is justified by this project.
 
 ## 9. Limitations
 
 - **Transportability is not established.** The PAPILA/RIM-ONE recovery chronology is adaptive development evidence. Target AUROC was displayed during development, and target anatomical resources affected preprocessing. It is not an untouched external test.
 - **The first locked source-only qualification failed.** HYGD-CEXT-1.1 produced equal-source mean AUROC 0.6227 [0.5822-0.6632]; its geometry candidate was ineligible before glaucoma-classifier training. See [SOURCE_ONLY_QUALIFICATION_REPORT.md](SOURCE_ONLY_QUALIFICATION_REPORT.md).
-- **A stronger representation did not solve the shortcut.** Frozen DINOv2 features reached equal-source mean AUROC 0.7105 [0.6746-0.7423], but dataset-origin accuracy was 0.9994 against a required value below 0.75. See [HYGD_CEXT_2_0_RESULT.md](HYGD_CEXT_2_0_RESULT.md).
+- **A stronger representation failed the prespecified source-origin gate.** Frozen DINOv2 features reached equal-source mean AUROC 0.7105 [0.6746-0.7423], but dataset-origin accuracy was 0.9994 against a required value below 0.75. See [HYGD_CEXT_2_0_RESULT.md](HYGD_CEXT_2_0_RESULT.md).
 - **Bounded preprocessing did not repair source decoding.** The best fixed branch reported equal-source mean AUROC 0.7364 while origin accuracy remained 0.9933. LEACE is mechanism evidence only. See [HYGD_SHORTCUT_MAP_1_RESULT.md](HYGD_SHORTCUT_MAP_1_RESULT.md).
-- **The RIM-ONE negative control remains unresolved.** Permutation AUROC remained 0.6759-0.7513 across later branches. Its mechanism is `needs-proof` and limits interpretation of the corresponding disease AUROCs.
+- **The RIM-ONE negative control needs a better null design.** Historical permutation AUROC remained 0.6759-0.7513 across later branches. The September audit found that image-row shuffling broke linked-subject label structure. The high-score mechanism is still `needs-proof`; neither that defect nor the origin probe alone proves causal shortcut reliance. See the [control audit and random-direction diagnostic](HYGD_REASSESSMENT_2026_09.md).
 - **All preferred internal evidence remains single-site.** The repaired evaluation uses 737 unique images and 283 linked groups, but every group comes from one hospital and one camera.
 - **Modest by design** — the preferred evaluator uses a partially-unfrozen ResNet18 (`layer4` + head), at most 10 epochs, no hyperparameter search, and no architecture search. It is not an attempt at maximum achievable performance (see the Scope note in §2).
-- **Calibration and clinical utility are untested.** The historical threshold sweep is not a deployment recommendation, and no patient-impact or prospective study was performed.
+- **Prospective calibration and clinical utility remain untested.** September added descriptive OOF probability diagnostics. No recalibration, clinical operating point, patient-impact or prospective study was established.
 - **This is a student portfolio/research artifact, not a clinical device, and must never be used for real diagnostic decisions.**
 
 ## Repository structure

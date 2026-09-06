@@ -1,0 +1,115 @@
+{
+  "experiment_id": "HYGD-RANDOM-DIRECTION-DIAGNOSTIC-20260906",
+  "status": "retrospective_representation_geometry_only",
+  "protocol_lock_sha256": "49b268530ad4d3400f7bc571b3a48d6661e1f929baeb3e17cfee1330049f7ee6",
+  "feature_sha256": "d99d9b056150d5e45ab6a007f22ea723e02fef1510c60f949b22c17154bf41a5",
+  "manifest_sha256": "bdc5aaf444a73868323a6f713f03a279888f1dc785c024d0ea8033d37bd8a5f6",
+  "analysis_code_sha256": "b4b8f18ee7deaa847abda245ace794cf55b091b0ad0adc705d98303aa03fc730",
+  "new_training_or_feature_extraction": false,
+  "mixed_source_fitting": false,
+  "new_target_access": false,
+  "sources": {
+    "HYGD": {
+      "status": "retrospective_representation_geometry_only",
+      "rows": 283,
+      "feature_dimensions": 384,
+      "seed": 20260906,
+      "n_directions": 1024,
+      "quantile_probabilities": [
+        0.025,
+        0.25,
+        0.5,
+        0.75,
+        0.975
+      ],
+      "auroc_quantiles": [
+        0.14303551912568307,
+        0.3440163934426229,
+        0.5067213114754099,
+        0.6553415300546448,
+        0.8689658469945355
+      ],
+      "fraction_auroc_at_least_0_75": 0.1337890625,
+      "fraction_auroc_at_most_0_25": 0.1142578125,
+      "fractions_are_p_values": false,
+      "label_based_direction_selection": false,
+      "model_fitting_or_inference": "no fitting; linear projections of existing frozen features only",
+      "limitations": [
+        "Random directions are not training-label permutations and need not share their distribution.",
+        "No causal mechanism, biological independence or transportability is identified.",
+        "Directional quantiles condition on these data; they are not sampling confidence intervals.",
+        "Results depend on the feature coordinate system and scaling; do not tune them for this diagnostic."
+      ],
+      "evaluation_unit": "mean frozen feature per linked evaluation group",
+      "supplied_groups": 283
+    },
+    "PAPILA": {
+      "status": "retrospective_representation_geometry_only",
+      "rows": 420,
+      "feature_dimensions": 384,
+      "seed": 20260906,
+      "n_directions": 1024,
+      "quantile_probabilities": [
+        0.025,
+        0.25,
+        0.5,
+        0.75,
+        0.975
+      ],
+      "auroc_quantiles": [
+        0.3010260260260261,
+        0.4283507645576611,
+        0.5109419764592178,
+        0.5841790065927996,
+        0.6918944806875841
+      ],
+      "fraction_auroc_at_least_0_75": 0.00390625,
+      "fraction_auroc_at_most_0_25": 0.001953125,
+      "fractions_are_p_values": false,
+      "label_based_direction_selection": false,
+      "model_fitting_or_inference": "no fitting; linear projections of existing frozen features only",
+      "limitations": [
+        "Random directions are not training-label permutations and need not share their distribution.",
+        "No causal mechanism, biological independence or transportability is identified.",
+        "Directional quantiles condition on these data; they are not sampling confidence intervals.",
+        "Results depend on the feature coordinate system and scaling; do not tune them for this diagnostic."
+      ],
+      "evaluation_unit": "eye image row; source subject clustering is not independently verified",
+      "supplied_groups": 210
+    },
+    "RIMONE": {
+      "status": "retrospective_representation_geometry_only",
+      "rows": 485,
+      "feature_dimensions": 384,
+      "seed": 20260906,
+      "n_directions": 1024,
+      "quantile_probabilities": [
+        0.025,
+        0.25,
+        0.5,
+        0.75,
+        0.975
+      ],
+      "auroc_quantiles": [
+        0.260377349728806,
+        0.4018222007578572,
+        0.4958020655323575,
+        0.5842280258563044,
+        0.7212613307080762
+      ],
+      "fraction_auroc_at_least_0_75": 0.0146484375,
+      "fraction_auroc_at_most_0_25": 0.0205078125,
+      "fractions_are_p_values": false,
+      "label_based_direction_selection": false,
+      "model_fitting_or_inference": "no fitting; linear projections of existing frozen features only",
+      "limitations": [
+        "Random directions are not training-label permutations and need not share their distribution.",
+        "No causal mechanism, biological independence or transportability is identified.",
+        "Directional quantiles condition on these data; they are not sampling confidence intervals.",
+        "Results depend on the feature coordinate system and scaling; do not tune them for this diagnostic."
+      ],
+      "evaluation_unit": "eye image row; source subject clustering is not independently verified",
+      "supplied_groups": 485
+    }
+  }
+}
