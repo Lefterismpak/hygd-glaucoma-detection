@@ -2,6 +2,8 @@
 
 **Status:** reviewer brief; claim hierarchy updated 2026-09-06
 
+**Broader follow-up:** [The remainder audit](HYGD_REMAINDER_AUDIT_2026_09.md) covers clinical import, image identity, weighted loss, BatchNorm, segmentation targets, inference, calibration and historical analysis boundaries. v6 repairs the loss aggregation and reproduces v5 OOF bytes; it adds no performance or clinical-validity claim.
+
 **New:** [September reassessment](HYGD_REASSESSMENT_2026_09.md) — complete v5 model execution, descriptive probability checks, a measured permutation-structure defect and reproducible control diagnostics.
 
 **Research conclusion:** the project demonstrates strong discrimination inside one
