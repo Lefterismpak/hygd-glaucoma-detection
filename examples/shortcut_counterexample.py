@@ -46,7 +46,7 @@ def draw_figure(result: dict, output: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 11, "svg.fonttype": "none", "svg.hashsalt": "hygd-counterexample-v1"}):
+    with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 11}):
         figure, axes = plt.subplots(1, 2, figsize=(11, 5))
         figure.subplots_adjust(top=0.74, bottom=0.25, wspace=0.28)
         figure.suptitle("Source encoding is not the same as model reliance", fontsize=18, fontweight="bold", y=0.97)
@@ -67,20 +67,19 @@ def draw_figure(result: dict, output: Path) -> None:
         figure.text(0.5, 0.067, "No medical data or trained model. This is a logical counterexample, not HYGD performance evidence.", ha="center", fontsize=9, color="#46536a")
         if output.exists():
             raise FileExistsError("Choose a new figure path; existing artifacts are preserved")
-        figure.savefig(output, dpi=180, metadata={"Creator": "HYGD synthetic counterexample", "Date": None} if output.suffix == ".svg" else {"Software": "HYGD synthetic counterexample"})
+        figure.savefig(output, dpi=180, metadata={"Software": "HYGD synthetic counterexample"})
         plt.close(figure)
-        if output.suffix == ".svg":
-            output.write_text("\n".join(line.rstrip() for line in output.read_text().splitlines()) + "\n")
+
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--figure", type=Path, help="Optional new PNG or SVG path (synthetic aggregate only)")
+    parser.add_argument("--figure", type=Path, help="Optional new PNG path (synthetic aggregate only)")
     args = parser.parse_args()
     result = run_counterexample()
     if args.figure:
-        if args.figure.suffix not in {".png", ".svg"}:
-            parser.error("Figure must end in .png or .svg")
+        if args.figure.suffix != ".png":
+            parser.error("Figure must end in .png")
         draw_figure(result, args.figure)
     print(json.dumps(result, indent=2, allow_nan=False))
 
