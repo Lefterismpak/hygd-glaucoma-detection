@@ -50,6 +50,7 @@ from src.experiments import (  # noqa: E402
     build_transforms,
 )
 from src.train import class_weights  # noqa: E402
+from src.loss_utils import cross_entropy_normalizer  # noqa: E402
 from validation.evaluation_utils import (  # noqa: E402
     DEFAULT_SEED,
     EXPECTED_HYGD_DATASET_IDENTITY,
@@ -139,6 +140,7 @@ def train_with_inner_validation(
     seed,
     *,
     verbose=True,
+    global_weighted_loss=False,
 ):
     """Train the fixed configuration and select the epoch using inner val loss only."""
 
@@ -184,23 +186,29 @@ def train_with_inner_validation(
     for epoch in range(1, epochs + 1):
         model.train()
         training_total = 0.0
+        training_mass = 0.0
         for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             loss = criterion(model(images), labels)
             loss.backward()
             optimizer.step()
-            training_total += loss.item() * len(images)
+            mass = cross_entropy_normalizer(labels, criterion.weight) if global_weighted_loss else len(images)
+            training_total += loss.item() * mass
+            training_mass += mass
 
         model.eval()
         validation_total = 0.0
+        validation_mass = 0.0
         with torch.no_grad():
             for images, labels in validation_loader:
                 images, labels = images.to(device), labels.to(device)
-                validation_total += criterion(model(images), labels).item() * len(images)
+                mass = cross_entropy_normalizer(labels, criterion.weight) if global_weighted_loss else len(images)
+                validation_total += criterion(model(images), labels).item() * mass
+                validation_mass += mass
 
-        training_loss = training_total / len(train_metadata)
-        validation_loss = validation_total / len(validation_metadata)
+        training_loss = training_total / training_mass
+        validation_loss = validation_total / validation_mass
         history.append(
             {
                 "epoch": epoch,
@@ -247,6 +255,16 @@ def write_csv(path, frame, *, overwrite=False):
 
 def run(args):
     started = time.time()
+    protocol = getattr(args, "protocol", "v5")
+    if protocol not in {"v5", "v6"}:
+        raise ValueError("Protocol must be explicitly v5 or v6")
+    use_v6 = protocol == "v6"
+    if use_v6 and args.max_folds is not None:
+        raise ValueError("v6 supports complete runs or audit-only; partial diagnostics retain the explicit v5 route")
+    from validation import evaluation_v6
+    protocol_version = evaluation_v6.PROTOCOL_VERSION if use_v6 else PROTOCOL_VERSION
+    result_validator = evaluation_v6.validate_result if use_v6 else validate_internal_result_payload
+    terminal_validator = evaluation_v6.validate_terminal if use_v6 else validate_terminal_bundle
     run_mode = classify_run_mode(
         folds=args.folds,
         epochs=args.epochs,
@@ -308,7 +326,7 @@ def run(args):
     write_csv(fold_path, group_folds)
 
     audit = {
-        "protocol_version": PROTOCOL_VERSION,
+        "protocol_version": protocol_version,
         "status": "audit_only_complete" if args.audit_only else "running",
         "dataset_identity": dataset_identity,
         "data_quality": data_quality,
@@ -328,7 +346,7 @@ def run(args):
     print(
         json.dumps(
             {
-                "protocol_version": PROTOCOL_VERSION,
+                "protocol_version": protocol_version,
                 "status": audit["status"],
                 "data_quality_aggregate": console_data_quality_summary(data_quality),
                 "audit_artifact": relative_path(audit_path),
@@ -383,6 +401,7 @@ def run(args):
             device,
             fold_seed,
             verbose=complete,
+            global_weighted_loss=use_v6,
         )
 
         inner_validation["probability"] = predict_probabilities(
@@ -541,7 +560,7 @@ def run(args):
             )
 
         result = {
-            "protocol_version": PROTOCOL_VERSION,
+            "protocol_version": protocol_version,
             "status": "complete",
             "completed_outer_folds": [int(fold) for fold in folds_to_run],
             "configuration_fixed_before_outer_evaluation": {
@@ -602,7 +621,7 @@ def run(args):
         }
     else:
         result = {
-            "protocol_version": PROTOCOL_VERSION,
+            "protocol_version": protocol_version,
             "status": "partial_smoke_run",
             "canonical_internal_estimate": False,
             "completed_outer_folds": [int(fold) for fold in folds_to_run],
@@ -615,7 +634,9 @@ def run(args):
             "runtime_seconds": round(time.time() - started, 1),
         }
     if complete:
-        validate_internal_result_payload(result)
+        if use_v6:
+            result["configuration_fixed_before_outer_evaluation"].update(evaluation_v6.TRAINING_FIELDS)
+        result_validator(result)
     else:
         validate_smoke_result_payload(result)
     if complete:
@@ -638,7 +659,7 @@ def run(args):
         for key, relative in result["artifacts"].items()
     }
     if complete:
-        validate_terminal_bundle(result, ROOT)
+        terminal_validator(result, ROOT)
     else:
         validate_terminal_smoke_bundle(result, ROOT)
     # The result is the bundle commit marker: it is published only after every
@@ -648,7 +669,7 @@ def run(args):
     if published_result != result:
         raise RuntimeError("Published result marker failed deterministic read-back")
     if complete:
-        validate_terminal_bundle(published_result, ROOT)
+        terminal_validator(published_result, ROOT)
     else:
         validate_terminal_smoke_bundle(published_result, ROOT)
     print(f"\nsaved {relative_path(result_path)}", flush=True)
@@ -673,6 +694,8 @@ def run(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--protocol", choices=["v5", "v6"], default="v5",
+                        help="v5 preserves historical batch-mean aggregation; v6 uses globally weighted CE")
     parser.add_argument("--raw-dir", default="data/raw")
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--epochs", type=int, default=10)
