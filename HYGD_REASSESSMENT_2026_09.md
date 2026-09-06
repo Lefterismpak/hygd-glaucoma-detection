@@ -1,5 +1,7 @@
 # HYGD scientific reassessment — September 2026
 
+> **Subsequent broader review:** [HYGD remainder audit and v6](HYGD_REMAINDER_AUDIT_2026_09.md) found additional training/ingestion/calibration/segmentation defects. The complete corrected-loss v6 run preserves the v5 predictions below. This page retains the first reassessment chronology; the new report owns the added findings.
+
 **Result:** the current evaluator now has a complete observed model run. The negative-control audit found a concrete exchangeability defect. Neither finding establishes transportability or a causal shortcut mechanism.
 
 ## What changed

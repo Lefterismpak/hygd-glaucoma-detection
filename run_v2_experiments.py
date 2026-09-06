@@ -88,7 +88,12 @@ def load_training_stack():
 
 
 def train_one(model, train_loader, val_loader, weights, epochs=EPOCHS, head_lr=1e-3, backbone_lr=1e-4):
-    """Train with discriminative LRs: new head fast, unfrozen backbone params slow."""
+    """Historical replay, including the original batch-dependent CE reporting.
+
+    The image-count average below is not globally normalized weighted CE and
+    can alter checkpoint ranking. It is retained to reproduce the historical
+    comparison; use internal_evaluation_repair.py --protocol v6 for the repair.
+    """
     model.to(DEVICE)
     criterion = torch.nn.CrossEntropyLoss(weight=weights.to(DEVICE))
 

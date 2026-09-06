@@ -1,5 +1,7 @@
 # Internal Evaluation Repair
 
+> **Weighted-loss repair / v6 — 2026-09-06:** v5 averaged weighted batch losses by image count, which need not equal global weighted cross entropy and can reverse checkpoint rankings. The new opt-in `--protocol v6` fixes the denominator while retaining the old v5 route. A complete run selected the same epochs and produced byte-identical OOF CSVs; the 0.9908 AUROC and 97/3/4/179 confusion remain unchanged. [Full audit](HYGD_REMAINDER_AUDIT_2026_09.md) · [v6 receipt](results/v6_complete_run_20260906.json).
+
 > **Complete current-code execution — 2026-09-06:** The unchanged public v5 evaluator now has an observed complete five-fold run. AUROC **0.9908 [0.9790–0.9990]**; **97 TN / 3 FP / 4 FN / 179 TP**. The older result below remains a separate retrospective record. See the [September report](HYGD_REASSESSMENT_2026_09.md) and [fresh aggregate receipt](results/v5_complete_run_20260906.json).
 
 > Historical run status: metrics from the private 2026-07-11 five-fold result were independently recomputed from the complete OOF files, but its run-start audit remained literally `running`; no contemporaneous terminal audit or public timestamp attestation exists.
@@ -31,9 +33,7 @@ This protocol governs the complete September v5 run. It is not a description of 
 
 ## Public reproduction path
 
-The executable path is public. A full numerical reproduction still requires the
-HYGD dataset and private model-run artifacts; the synthetic suite verifies the
-integrity contracts without claiming to reproduce the AUROC. The public
+The executable path is public. A fresh v6 run requires public HYGD data, appropriate weights and the recorded software/recipe, not someone else's private predictions. Exact verification of an existing receipt additionally requires its bound private model-run artifacts. The synthetic suite verifies integrity contracts without claiming to reproduce the AUROC. The public
 [aggregate receipt](results/repaired_internal_evaluation_summary.json) publishes
 metrics and SHA-256 commitments, not row-level predictions.
 
