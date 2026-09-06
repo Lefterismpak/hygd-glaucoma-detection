@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 from torchvision import models
 
 from src.data_utils import preprocess_image
+from src.loss_utils import LossAccumulator, cross_entropy_normalizer
 
 
 class HYGDDataset(Dataset):
@@ -33,9 +34,10 @@ class HYGDDataset(Dataset):
 def build_model(num_classes=2, freeze_backbone=True):
     """ResNet18 pretrained on ImageNet, with a new binary classification head.
 
-    `freeze_backbone=True` trains only the new head first — a sane default for
-    a small (747-image) dataset where fine-tuning the whole network risks
-    overfitting. Unfreeze later (set to False) once the head-only baseline works.
+    `freeze_backbone=True` freezes backbone parameters. The retained training
+    loop calls model.train(), so BatchNorm running statistics still adapt. This
+    is not a completely fixed feature extractor; the distinction matters when
+    interpreting the historical "head-only" comparison.
     """
     model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
 
@@ -69,7 +71,7 @@ def train(model, train_loader, val_loader, epochs=10, lr=1e-3, device="cpu", wei
 
     for epoch in range(epochs):
         model.train()
-        running_loss = 0.0
+        training_loss = LossAccumulator()
         for images, labels in train_loader:
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
@@ -77,18 +79,18 @@ def train(model, train_loader, val_loader, epochs=10, lr=1e-3, device="cpu", wei
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            running_loss += loss.item() * images.size(0)
-        train_loss = running_loss / len(train_loader.dataset)
+            training_loss.add(loss.item(), cross_entropy_normalizer(labels, criterion.weight))
+        train_loss = training_loss.mean()
 
         model.eval()
-        val_running_loss = 0.0
+        validation_loss = LossAccumulator()
         with torch.no_grad():
             for images, labels in val_loader:
                 images, labels = images.to(device), labels.to(device)
                 outputs = model(images)
                 loss = criterion(outputs, labels)
-                val_running_loss += loss.item() * images.size(0)
-        val_loss = val_running_loss / len(val_loader.dataset)
+                validation_loss.add(loss.item(), cross_entropy_normalizer(labels, criterion.weight))
+        val_loss = validation_loss.mean()
 
         history["train_loss"].append(train_loss)
         history["val_loss"].append(val_loss)
