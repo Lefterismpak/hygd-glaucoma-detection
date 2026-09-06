@@ -1,0 +1,28 @@
+{
+  "experiment_id": "HYGD-V5-RERUN-20260906",
+  "frozen_utc": "2026-09-06T04:16:17.665995+00:00",
+  "public_base_commit": "954be17aa11377b73b7810a067266bfe341ccd52",
+  "protocol": "2026-09-04-v5",
+  "intent": "single complete execution of the unchanged locked recipe; no claim of fresh untouched population",
+  "recipe": {
+    "folds": 5,
+    "epochs": 10,
+    "batch_size": 32,
+    "seed": 20260711,
+    "inner_val_fraction": 0.15,
+    "target_sensitivity": 0.95,
+    "bootstrap": 5000,
+    "device": "mps"
+  },
+  "source_sha256": {
+    "validation/evaluation_utils.py": "299278e2699d01c5e5b5209f1c96768f59daaaf980cb919315cfb0f8ec12a9bf",
+    "validation/internal_evaluation_repair.py": "f353aaba1bfdf4ec1983d5ebf6eb8851a20c0ebedff49b98fc48e04466a4ddef",
+    "src/data_utils.py": "f2fd61996d593fbf06e961b592e7d68e04cf65a6f31f96e95c376fb439621747",
+    "src/experiments.py": "d2f7f9783bef833d63267cd15b2408d9af856a4436a6348fca0b8414e3c3d252"
+  },
+  "weight_sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "weight_bytes": 46830571,
+  "network": "denied by sandbox-exec network* rule",
+  "outputs": "private git-ignored results/internal_evaluation_repair_20260906_v5*",
+  "publication": "aggregate-only after terminal verification; no row data, identifiers, paths, weights or images"
+}

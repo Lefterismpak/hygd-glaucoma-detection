@@ -1,0 +1,14 @@
+{
+  "experiment_id": "HYGD-RANDOM-DIRECTION-DIAGNOSTIC-20260906",
+  "frozen_utc": "2026-09-06T04:29:39.413052+00:00",
+  "evidence_type": "retrospective representation geometry diagnostic, not a permutation significance test",
+  "features_sha256": "d99d9b056150d5e45ab6a007f22ea723e02fef1510c60f949b22c17154bf41a5",
+  "n_directions": 1024,
+  "seed": 20260906,
+  "directions": "isotropic Gaussian, L2 normalized; no fitting, outcome-based choice or sign flipping",
+  "sources": "each separately; HYGD mean feature per existing group; PAPILA eye rows, RIMONE image rows",
+  "summaries": "AUROC quantiles 2.5/25/50/75/97.5 percent; fractions >=0.75 and <=0.25",
+  "interpretation": "feature geometry only; random-direction fractions are not p-values; cannot explain exact training-permutation mechanism or establish causal reliance",
+  "original_protocol_gates": "unchanged and closed",
+  "no_new_images_weights_or_model_training": true
+}
