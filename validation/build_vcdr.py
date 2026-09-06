@@ -1,21 +1,28 @@
-"""Compute vertical cup-to-disc ratio (VCDR) for every image, as a continuous,
-camera-independent glaucoma target for the Attempt-B multi-task head.
+"""Historical adaptive preparation of an anatomy-related auxiliary VCDR target.
 
-VCDR = (vertical extent of optic cup) / (vertical extent of optic disc). Higher
-VCDR = more glaucomatous cupping. Because it is a morphology ratio, it cannot be
-satisfied by a dataset bezel/colour shortcut — which is why it improves transfer.
+VCDR is vertical cup extent divided by vertical disc extent. A morphology ratio
+is not a diagnosis and does not guarantee camera invariance or prevent shortcut
+prediction. Measurement, contour aggregation and model-derived labels can all
+carry dataset-specific bias; no causal transfer benefit was established here.
 
-- PAPILA: rasterize disc AND cup expert contours -> vertical extents (held out from
-  training; used only to sanity-check the VCDR head).
+- PAPILA: rasterize disc AND cup expert contours -> vertical extents. The main
+  function also includes these images/contours in cup-disc segmenter training;
+  the previous claim that they were held out from that training was incorrect.
 - RIM-ONE: read shipped Disc-T + Cup-T PNG masks.
 - HYGD (no masks): a 2-channel (disc,cup) U-Net trained on PAPILA+RIM-ONE predicts both.
 
-Outputs validation/data/vcdr.csv (dataset,stem,vcdr). Masks/images stay local.
+PAPILA is excluded from the final forward disease-loss source set, which is a
+different claim from exclusion from every upstream preparation model. The final
+forward/reverse scripts mask predicted HYGD VCDR out of their auxiliary loss;
+the historical HYGD disc-crop localizer still used target-domain anatomy.
+Outputs validation/data/vcdr.csv (dataset,stem,vcdr). All derived rows stay private.
+The original source mixing and protocol limitations remain unresolved.
 """
 
 import glob
 import os
 from pathlib import Path
+import sys
 
 import cv2
 import numpy as np
@@ -24,6 +31,10 @@ import torch
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from validation.mask_targets import binary_training_mask
+from validation.evaluation_utils import assert_fresh_output_bundle, atomic_write_text
 DATA = ROOT / "validation/data"
 PAP = DATA / "papila/PapilaDB-PAPILA-17f8fa7746adb20275b5b6a0d99dc9dfe3007e9f"
 SEG = DATA / "rimone_segs/RIM-ONE_DL_reference_segmentations"
@@ -74,6 +85,9 @@ def train_cupdisc_unet(items, epochs=16, size=256):
             path, mkfn = self.it[i]
             img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
             d, c = mkfn(img.shape[:2])
+            # Released RIM-ONE PNGs encode foreground as 255. BCE requires 0/1,
+            # not the raw PNG intensity; the historical implementation missed it.
+            d, c = binary_training_mask(d), binary_training_mask(c)
             img = cv2.resize(img, (size, size)).astype(np.float32) / 255.0
             d = cv2.resize(d, (size, size), interpolation=cv2.INTER_NEAREST)
             c = cv2.resize(c, (size, size), interpolation=cv2.INTER_NEAREST)
@@ -105,8 +119,9 @@ def train_cupdisc_unet(items, epochs=16, size=256):
 
 
 def main():
+    assert_fresh_output_bundle([DATA / "vcdr.csv"])
     rows = []
-    # PAPILA (GT) — for validation of the head, not training
+    # Dataset contour-derived values; PAPILA also trains the segmenter below.
     pl = pd.read_csv(DATA / "papila_labels.csv")
     for _, r in pl.iterrows():
         stem = os.path.splitext(os.path.basename(r["image_path"]))[0]
@@ -153,7 +168,7 @@ def main():
         rows.append({"dataset": "HYGD", "stem": os.path.splitext(name)[0], "vcdr": vcdr_from_masks(d, c)})
 
     df = pd.DataFrame(rows).dropna(subset=["vcdr"])
-    df.to_csv(DATA / "vcdr.csv", index=False)
+    atomic_write_text(DATA / "vcdr.csv", df.to_csv(index=False))
     for ds in ["HYGD", "RIMONE", "PAPILA"]:
         s = df[df.dataset == ds]["vcdr"]
         print(f"  {ds}: n={len(s)} mean VCDR {s.mean():.3f}")

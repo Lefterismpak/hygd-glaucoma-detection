@@ -1,5 +1,7 @@
 # HYGD: Failure-First Glaucoma AI Evaluation
 
+> **Broader audit / v6 — 2026-09-06:** The [remainder audit](HYGD_REMAINDER_AUDIT_2026_09.md) repairs weighted-loss aggregation, clinical-label parsing, 0/255 segmentation targets and a temperature-optimizer trap. A complete v6 run retained the same selected epochs and **byte-identical OOF predictions** as v5: AUROC **0.9908 [0.9790–0.9990]**, confusion **97/3/4/179**. This is a correctness improvement with **no measured performance gain**. [v6 aggregate receipt](results/v6_complete_run_20260906.json). Use `--protocol v6` for corrected aggregation; the default v5 remains an explicit historical replay path.
+
 > **New evidence — 2026-09-06:** A complete run of the unchanged v5 evaluator now reproduces mean outer-fold linked-group AUROC **0.9908 [0.9790–0.9990]** over 283 groups, with **97 TN / 3 FP / 4 FN / 179 TP** at inner-selected thresholds. New probability diagnostics, an exchangeability audit and a frozen representation diagnostic add evidence about what the score does and does not establish. [September reassessment](HYGD_REASSESSMENT_2026_09.md) · [Fresh aggregate receipt](results/v5_complete_run_20260906.json). **Internal post-development evidence; transportability remains unproved.**
 >
 > **Previous evidence snapshot (2026-09-04; legacy run only):** the preferred internal discrimination estimate is a read-only aggregate reanalysis of frozen OOF predictions from a private five-fold model run asserted to date from 2026-07-11: mean outer-fold linked-group AUROC **0.9908** (conditional 95% CI **0.9790-0.9990**; 283 groups). No contemporaneous public timestamp attests that legacy run, and no model was retrained. The current public implementation is `2026-09-04-v5`; no end-to-end v5 model run is claimed for these numbers. See the privacy-safe [aggregate receipt](results/repaired_internal_evaluation_summary.json).
@@ -46,7 +48,7 @@ Download: `https://physionet.org/content/hillel-yaffe-glaucoma-dataset/get-zip/1
 
 - **Historical development split:** patient-level `GroupShuffleSplit` (`sklearn`), 70/15/15 train/val/test, seed 42. It had zero supplied-patient overlap, but configurations were compared on its test partition and its image-row confidence intervals did not account for repeated images.
 - **Preferred internal evaluation:** exact SHA-256 duplicates are counted once; supplied patient IDs sharing a hash are linked into one evaluation group; five stratified outer group folds are separated from the inner group split used for checkpoint and threshold selection; each outer fold is evaluated once. Confidence intervals resample whole evaluation groups.
-- **Historical frozen-head baseline recipe:** resize to 224×224 and apply ImageNet normalization; train a new two-class ResNet18 head over a frozen ImageNet backbone for 8 epochs with class-weighted `CrossEntropyLoss`, Adam at 1e-3, batch size 32, on CPU. The historical split produced weights `[1.98, 0.67]` for GON-/GON+.
+- **Historical parameter-frozen baseline recipe (BatchNorm statistics adapted):** resize to 224×224 and apply ImageNet normalization; train a new two-class ResNet18 head over a frozen ImageNet backbone for 8 epochs with class-weighted `CrossEntropyLoss`, Adam at 1e-3, batch size 32, on CPU. The historical split produced weights `[1.98, 0.67]` for GON-/GON+.
 - **Preferred evaluator's fixed recipe:** resize to 224×224, apply light training-only augmentation (horizontal flip, rotation, mild colour jitter) and ImageNet normalization; fine-tune ResNet18 `layer4` at 1e-4 and its head at 1e-3 for at most 10 epochs, batch size 32. Class weights are recomputed inside each outer-training partition, and the checkpoint is selected solely by minimum inner-validation loss before the outer fold is evaluated.
 
 ## 5. Results
@@ -114,7 +116,8 @@ The repaired internal evaluator and its dataset-free regression suite are now pu
 ```bash
 python -m unittest discover -s validation -p 'test_*.py' -v
 python validation/internal_evaluation_repair.py --audit-only
-python validation/internal_evaluation_repair.py
+python validation/internal_evaluation_repair.py --protocol v6
+python validation/evaluation_v6.py --describe-contract
 python validation/reanalyze_frozen_oof.py --describe-contract
 python validation/summarize_completed_run.py --describe-contract
 python examples/shortcut_counterexample.py

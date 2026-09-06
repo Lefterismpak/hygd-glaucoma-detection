@@ -33,10 +33,10 @@ IMAGENET_STD = [0.229, 0.224, 0.225]
 def build_transforms(train, image_size=224):
     """Train transforms include light augmentation appropriate for fundus images.
 
-    Fundus photos are roughly rotation/flip invariant for the disc (the optic
-    nerve head looks glaucomatous or not regardless of small orientation
-    changes), so horizontal flip + small rotation + mild color jitter are safe.
-    We deliberately avoid vertical flip (unnatural for retina) and heavy jitter.
+    These are fixed historical modeling choices, not a clinically validated
+    invariance claim. Their effects on anatomical orientation, laterality and
+    disease signal were not independently adjudicated. Preserve this recipe
+    when reproducing the fixed v5/v6 comparisons.
     """
     if train:
         return transforms.Compose([
@@ -87,11 +87,11 @@ class TransformHYGDDataset(Dataset):
 # ----------------------------------------------------------------------------
 
 def build_model(num_classes=2, mode="frozen", *, pretrained=True):
-    """mode: 'frozen' (head only) or 'finetune_layer4' (unfreeze last residual block).
+    """Freeze parameters except the head, or unfreeze layer4 plus the head.
 
-    Fine-tuning only layer4 (not the whole backbone) is the middle ground for a
-    small dataset: it lets the highest-level features adapt to fundus images
-    without the overfitting risk of unfreezing all 11M parameters.
+    Both modes retain training-mode BatchNorm updates in the training loop,
+    including buffers in parameter-frozen layers. "Frozen" therefore describes
+    parameters, not an immutable feature extractor or guaranteed overfit control.
     """
     weights = models.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None
     model = models.resnet18(weights=weights)

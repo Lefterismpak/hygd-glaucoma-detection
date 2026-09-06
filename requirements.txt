@@ -11,3 +11,8 @@ torch
 torchvision
 grad-cam
 certifi
+
+# Historical preparation / clinical-table import paths (not a license grant).
+openpyxl==3.1.5
+opencv-python-headless==5.0.0.93
+segmentation-models-pytorch==0.5.0

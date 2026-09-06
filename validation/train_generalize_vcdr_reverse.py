@@ -196,6 +196,8 @@ def main():
             swa_n += 1
         print(f"    epoch {ep+1}/{a.epochs}  src-val {va_auc:.3f}  [{HELD_OUT} {ha:.3f}]", flush=True)
 
+    # Historical variant: average full states, including BatchNorm buffers.
+    # No post-average activation-statistics recomputation was performed.
     ref = model.state_dict()
     model.load_state_dict({k: (v / swa_n).to(ref[k].dtype).to(ref[k].device) for k, v in swa_sum.items()})
     final, Y, P, patient_ids = heldout_auc(model, hold, tta=True)

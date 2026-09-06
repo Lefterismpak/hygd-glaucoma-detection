@@ -407,7 +407,7 @@ class PublicClaimBoundaryTests(unittest.TestCase):
     def test_readme_separates_historical_and_preferred_model_recipes(self):
         readme = (ROOT / "README.md").read_text().lower()
         methods = readme.split("## 4. methods", 1)[1].split("## 5. results", 1)[0]
-        self.assertIn("historical frozen-head baseline recipe", methods)
+        self.assertIn("historical parameter-frozen baseline recipe", methods)
         self.assertIn("preferred evaluator's fixed recipe", methods)
         self.assertIn("fine-tune resnet18 `layer4`", methods)
         self.assertIn("10 epochs", methods)

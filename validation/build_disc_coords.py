@@ -5,17 +5,20 @@ outputs do not establish localization accuracy, causal shortcut removal, or
 cross-dataset transportability; later locked source-only gates did not qualify
 the candidate.
 
-- PAPILA: rasterize the expert disc contours (avg of exp1/exp2) -> GT centre/diam.
+- PAPILA: rasterize the union of both expert disc contours -> derived centre/diam.
 - RIM-ONE: read the shipped Disc-T PNG masks -> GT centre/diam.
 - HYGD (no masks): train a small U-Net (smp, resnet18 encoder) on the PAPILA+RIM-ONE
   disc masks, then predict the disc on all HYGD images -> centre/diam.
 
 Outputs validation/data/disc_coords.csv (dataset,image_path,cx,cy,diameter) and a
 few sanity contact sheets in figures/. Images stay local (git-ignored).
+The segmenter uses an ordered image split, not a patient-disjoint random split.
+Its validation Dice cannot establish independent-subject geometry transfer.
 """
 
 import glob
 import os
+import sys
 from pathlib import Path
 
 import cv2
@@ -25,6 +28,9 @@ import torch
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from validation.evaluation_utils import assert_fresh_output_bundle, atomic_write_text
 DATA = ROOT / "validation/data"
 PAP = DATA / "papila/PapilaDB-PAPILA-17f8fa7746adb20275b5b6a0d99dc9dfe3007e9f"
 DEV = "mps" if torch.backends.mps.is_available() else "cpu"
@@ -160,6 +166,7 @@ def predict_hygd(model, size=256):
 
 
 def main():
+    assert_fresh_output_bundle([DATA / "disc_coords.csv"])
     print("== PAPILA disc from contours =="); pap = papila_coords(); print(f"  {len(pap)} coords")
     print("== RIM-ONE disc from PNG masks =="); rim = rimone_coords(); print(f"  {len(rim)} coords")
 
@@ -197,7 +204,7 @@ def main():
     print(f"  {len(hygd)} HYGD coords")
 
     out = pd.concat([pap, rim, hygd], ignore_index=True)
-    out.to_csv(DATA / "disc_coords.csv", index=False)
+    atomic_write_text(DATA / "disc_coords.csv", out.to_csv(index=False))
     print(f"saved {DATA/'disc_coords.csv'}  ({len(out)} rows; unet_val_dice={dice:.3f})")
 
 
