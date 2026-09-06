@@ -1,0 +1,244 @@
+{
+  "schema_version": "hygd-remainder-audit-v1",
+  "scope": "component audit plus one fixed v6 HYGD-only rerun; not clinical validation",
+  "image_identity": {
+    "status": "read_only_identity_extension_audit",
+    "byte_unique_images": 737,
+    "pixel_unique_images": 737,
+    "additional_pixel_duplicate_sets": 0,
+    "cross_group_pixel_duplicate_sets": 0,
+    "exif_orientation_nondefault": 0,
+    "cross_group_phash_candidate_pairs_distance_le_4": 57,
+    "phash_candidates_are_not_subject_identity_proof": true
+  },
+  "registration_screen": {
+    "phash_pairs": 57,
+    "strong_registration_candidates": 0,
+    "candidate_threshold": "SIFT 512 CLAHE 2; Lowe ratio 0.7; homography RANSAC 3; >=12 inliers, >=0.5 fraction, >=0.1 image coverage; not identity proof",
+    "controls": {
+      "same_declared_group": 0,
+      "random_cross_group": 0
+    }
+  },
+  "registration_control_limit": {
+    "synthetic_affine_controls": 5,
+    "controls_meeting_frozen_screen": 2,
+    "real_capture_sensitivity_established": false,
+    "automatic_identity_merges": 0
+  },
+  "papila_label_reconciliation": {
+    "status": "passed",
+    "rows": 420,
+    "subjects": 210,
+    "glaucoma_eyes": 87,
+    "healthy_eyes": 333,
+    "label_identity_matches_frozen_legacy_csv": true,
+    "missing_new_paths": 0,
+    "legacy_csv_sha256": "88add192c24465a7d75792951bc2c428629915ecf1306a27b3204eeb17d0a5b3",
+    "new_csv_sha256": "6001a05cfa6b9d36e8874f388b87366483b0ef91790933ab94ecf544ea5c38d7"
+  },
+  "mask_encoding": {
+    "mask_files_inspected": 970,
+    "encoding_counts": {
+      "(0, 255)": 970
+    },
+    "unsupported_encodings": 0,
+    "legacy_training_path_passed_raw_255_to_bce": true,
+    "synthetic_bce_logit_1_target_255": -253.68673706054688,
+    "scope": "numeric target-encoding defect; no retrospective claim that every disease model used these predictions",
+    "hygd_predicted_vcdr_masked_in_final_auxiliary_loss": true
+  },
+  "legacy_point_and_geometry_replay": {
+    "scope": "read-only aggregate replay; no retraining or target access",
+    "groups": {
+      "CEXT1.1": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.5219672131147541,
+            "file_sha256": "940de5e599ee15bd2bd54b83357ce94895e12bf633e2bd2658a5be4da2fdd063"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.56511684097891,
+            "file_sha256": "a0a14128fe5055d3c526ae47fe6f0b32ae6a9f9ca068f3cfbaa7bac4a457762d"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.781075860019318,
+            "file_sha256": "91b6be829fa78fc6b57ddcd796a2e77a8dc33cea9847fbe343d8d6e1489d7ce5"
+          }
+        },
+        "equal_source_mean_auroc": 0.622719971370994
+      },
+      "CEXT2.0": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.6261202185792349,
+            "file_sha256": "7ca14566e72bb73b988ece3b2289faba1fcf57212db39c14f9a038a1519ab396"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.7595871733802768,
+            "file_sha256": "8a5db0c20bd3bade9f76f3aa4e7d877d67ba6a58614f0f1a018730048eb26747"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.7456534660821754,
+            "file_sha256": "0725d077b7a3e59d01798579451108d704e7bd3a8d318976b437fc3013f6e54f"
+          }
+        },
+        "equal_source_mean_auroc": 0.7104536193472292
+      },
+      "S1": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.5859016393442623,
+            "file_sha256": "1a185c02c24e529d308ca755072851f9a98514d0ff50a54f2e4e5a56ee371272"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.7569293431362397,
+            "file_sha256": "e8aaa78a6fbc8cdc441fe63a99170f24dc85d38fc8716cc7fc85b5b4aa4aebea"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.7787354186789507,
+            "file_sha256": "bf1bdc5a1f55a83e5648d1549dd18dfdd9327d867b9e04a80838ab332875d883"
+          }
+        },
+        "equal_source_mean_auroc": 0.7071888003864842
+      },
+      "S2": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.6799453551912569,
+            "file_sha256": "38a991612f6fdba015b6df4463e87e00b8b8fd45678f91440724e6d8a96fceaf"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.7597597597597598,
+            "file_sha256": "ebf90bc96a86a4e1eed1532e8dd3a9c9e54a6e86a6d83ee6001ca2f54a4fabc2"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.7694479530425737,
+            "file_sha256": "065bfe07492c66f6fbffc02889c649441448d9895bf215079cc2868b4093f534"
+          }
+        },
+        "equal_source_mean_auroc": 0.7363843559978634
+      },
+      "S3_CF": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.6068306010928961,
+            "file_sha256": "ed0c6c078ff88100b6b1c2c916e32f3b2bd79b42a0006f269af36db735aaf65f"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.7598633115874496,
+            "file_sha256": "fe93a090bb430f74b543629ebeabb6ce0773ac810301cb5c17165517190ffb43"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.7620179805334721,
+            "file_sha256": "ef26acf1de7b6ac84d619f3cbdf90f884bee61f697781f07dd0787c5e5f7542b"
+          }
+        },
+        "equal_source_mean_auroc": 0.7095706310712725
+      },
+      "S3_GLOBAL": {
+        "sources": {
+          "hygd": {
+            "n_evaluation_units": 283,
+            "auroc": 0.6159016393442623,
+            "file_sha256": "e2436bd821b994740744d287256f836dbcd8438a08321c12e7f1c460c3cc91af"
+          },
+          "papila": {
+            "n_evaluation_units": 420,
+            "auroc": 0.7457802630216424,
+            "file_sha256": "9e0b7bfc4ae49643413048def5262637814f57060d52c329f003cf143be12f5b"
+          },
+          "rimone": {
+            "n_evaluation_units": 485,
+            "auroc": 0.743498774054536,
+            "file_sha256": "a9826c89fc6a750e64576cafa32527514cb734d6c9a679f3c0b516f82654eb26"
+          }
+        },
+        "equal_source_mean_auroc": 0.7017268921401468
+      }
+    },
+    "manual_geometry": {
+      "images": 36,
+      "available": 35,
+      "coverage": 0.9722222222222222,
+      "center_rate_available": 1.0,
+      "diameter_rate_available": 0.6285714285714286,
+      "combined_rate_all": 0.6111111111111112,
+      "median_center_error": 0.0777603183438399,
+      "median_diameter_ratio": 1.75825982373781
+    }
+  },
+  "v5_v6_comparison": {
+    "selected_epochs_v5": [
+      4,
+      10,
+      3,
+      9,
+      1
+    ],
+    "selected_epochs_v6": [
+      4,
+      10,
+      3,
+      9,
+      1
+    ],
+    "identical_oof_image_bytes": true,
+    "identical_oof_group_bytes": true,
+    "recorded_validation_losses_changed": true,
+    "interpretation": "batch-aggregation defect is real but did not change selected epochs or predictions in this fixed run; no performance gain claimed"
+  },
+  "v6_independent_numeric_check": {
+    "status": "passed",
+    "method": "independent NumPy pairwise AUROC and direct Bernoulli scores; no production metric or sklearn metric functions",
+    "primary_auroc_match": true,
+    "bootstrap_replicates_matched": 5000,
+    "primary_intervals_match": true,
+    "brier_and_log_loss_match": true,
+    "public_summary_sha256": "d6ac948805249b5b4a5d0e96b713bcf4a1b5751325b9feea4f3f43f5b24f2b83",
+    "reviewer": "main-owned deterministic check, not independent peer review"
+  },
+  "inference_parity": {
+    "status": "passed",
+    "images": 99,
+    "max_absolute_difference": 2.771615982055664e-06,
+    "mean_absolute_difference": 1.7305517923721875e-07,
+    "tolerance": 0.0001,
+    "scope": "same verified bytes, single-image versus batch execution; not training provenance or clinical validation",
+    "checkpoint_sha256": "2dff252fc8775af7916ed293c29287b602c8eb469f065df1c248c89aed9a1db2",
+    "image_byte_sequence_sha256": "4dd598843367ec4a8258dbf382e4c448bf7ec16a6b7d211ed1ee3201447b601e"
+  },
+  "temperature_regression": {
+    "seed": 10,
+    "old_temperature": 0.001,
+    "old_true_nll": 45.53048395275377,
+    "repaired_temperature": 0.42576837771021325,
+    "repaired_true_nll": 0.19544596911775303,
+    "synthetic_cases_checked": 12,
+    "max_absolute_oracle_gap": 1.7735812818386876e-13,
+    "historical_patient_output_failure_not_inferred": true
+  },
+  "remaining_uncertainty": [
+    "biological subject identity",
+    "clinical/external validity",
+    "full mixed-source usage compatibility",
+    "fresh clinical anatomy adjudication",
+    "exact historical effect of the malformed pseudo-label generator",
+    "independent peer review"
+  ]
+}
